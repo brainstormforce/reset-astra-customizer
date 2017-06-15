@@ -52,11 +52,16 @@
 
 		        // Process AJAX.
 		        jQuery.post( ajaxurl, data, function( result ) {
-		        	wp.customize.state( 'saved' ).set( true );
+
+		        	// If pass then trigger the state 'saved'.
+		        	if( 'pass' === result.data ) {
+			        	wp.customize.state( 'saved' ).set( true );
+			        }
 
 	        		var Url = window.location.href;
 						Url = Url.split( "?" )[0];
 						window.location.href = Url;
+
 		        });
 	        }
 	    });

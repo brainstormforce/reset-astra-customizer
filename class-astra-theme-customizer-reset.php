@@ -29,9 +29,17 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
 		 * Member Variable
 		 *
 		 * @since 1.0.0
-		 * @var instance
+		 * @var $instance
 		 */
 		private static $instance;
+
+		/**
+		 * WordPress Customizer Object
+		 *
+		 * @since 1.0.0
+		 * @var $wp_customize
+		 */
+		private $wp_customize;
 
 		/**
 		 * Initiator
@@ -54,7 +62,19 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
 
 			add_action( 'wp_ajax_astra_customizer_reset',  			array( $this, 'ajax_customizer_reset' ) );
 			add_action( 'customize_controls_enqueue_scripts',   	array( $this, 'controls_scripts' ) );
+			add_action( 'customize_register', 						array( $this, 'customize_register' ) );
 
+		}
+
+		/**
+		 * Customize Register Description
+		 *
+		 * @param  object $wp_customize Object of WordPress customizer.
+		 * @return void
+		 * @since 1.0.0
+		 */
+		public function customize_register( $wp_customize ) {
+			$this->wp_customize = $wp_customize;
 		}
 
 		/**
@@ -65,11 +85,18 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
 		 */
 		public function ajax_customizer_reset() {
 
+			// Request come from a customizer preview?
+			if ( ! $this->wp_customize->is_preview() ) {
+				wp_send_json_error( 'fail' );
+			}
+
 			// Validate nonce.
 			check_ajax_referer( 'astra-customizer-reset', 'nonce' );
 
 			// Reset option 'astra-settings'.
 			delete_option( ASTRA_THEME_SETTINGS );
+			
+			wp_send_json_error( 'pass' );
 
 			wp_die();
 		}
