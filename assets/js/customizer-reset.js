@@ -23,15 +23,15 @@
 	 */
 	jQuery( document ).ready(function($) {
 
-	    var container = jQuery( '#customize-header-actions' );
+		var container = jQuery( '#customize-header-actions' ),
+			button    = jQuery( '<input type="submit" name="astra-reset" id="astra-reset" class="button-secondary button">' )
+				        .attr( 'value', astraCustomizer.customizer.reset.stringReset )
+				        .css({
+				            'float': 'right',
+				            'margin-top': '9px'
+				        });
 
-	    var button = jQuery( '<input type="submit" name="astra-reset" id="astra-reset" class="button-secondary button">' )
-	        .attr( 'value', astraCustomizer.customizer.reset.stringReset )
-	        .css({
-	            'float': 'right',
-	            'margin-top': '9px'
-	        });
-
+		// Process on click.
 	    button.on('click', function (event) {
 	        event.preventDefault();
 
@@ -47,20 +47,16 @@
 		            nonce: astraCustomizer.customizer.reset.nonce
 		        };
 
+		        // Disable button.
 		        button.attr( 'disabled', 'disabled' );
 
+		        // Process AJAX.
 		        jQuery.post( ajaxurl, data, function( result ) {
 		        	wp.customize.state( 'saved' ).set( true );
 
-		        	var data = {
-			            action: 'astra_regenerate_assets',
-			        };
-
-			        jQuery.post( ajaxurl, data, function( result ) {
-		        		var Url = window.location.href;
-							Url = Url.split( "?" )[0]
-							window.location.href = Url;
-		        	});
+	        		var Url = window.location.href;
+						Url = Url.split( "?" )[0];
+						window.location.href = Url;
 		        });
 	        }
 	    });

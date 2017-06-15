@@ -1,0 +1,105 @@
+<?php
+/**
+ * Plugin Name: Astra Customizer Reset
+ * Plugin URI: http://www.ultimatebeaver.com/
+ * Description: Reset astra theme customizer options.
+ * Version: 1.0.0
+ * Author: Brainstorm Force
+ * Author URI: http://www.brainstormforce.com
+ * Text Domain: astra-customizer-reset
+ *
+ * @package Astra Customizer Reset
+ */
+
+define( 'ASTRA_CUSTOMIZER_RESET_URI', plugins_url( '/', __FILE__ ) );
+
+/**
+ * Astra Customizer Reset
+ *
+ * @since 1.0.0
+ */
+if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
+
+	/**
+	 * Astra Customizer Reset
+	 */
+	class Astra_Theme_Customizer_Reset {
+
+		/**
+		 * Member Variable
+		 *
+		 * @since 1.0.0
+		 * @var instance
+		 */
+		private static $instance;
+
+		/**
+		 * Initiator
+		 *
+		 * @since 1.0.0
+		 */
+		public static function get_instance() {
+			if ( ! isset( self::$instance ) ) {
+				self::$instance = new self;
+			}
+			return self::$instance;
+		}
+
+		/**
+		 * Constructor
+		 *
+		 * @since 1.0.0
+		 */
+		public function __construct() {
+
+			add_action( 'wp_ajax_astra_customizer_reset',  			array( $this, 'ajax_customizer_reset' ) );
+			add_action( 'customize_controls_enqueue_scripts',   	array( $this, 'controls_scripts' ) );
+
+		}
+
+		/**
+		 * AJAX Customizer Reset
+		 *
+		 * @since 1.0.0
+		 * @return void
+		 */
+		public function ajax_customizer_reset() {
+
+			// Validate nonce.
+			check_ajax_referer( 'astra-customizer-reset', 'nonce' );
+
+			// Reset option 'astra-settings'.
+			delete_option( ASTRA_THEME_SETTINGS );
+
+			wp_die();
+		}
+
+		/**
+		 * Customizer Scripts
+		 *
+		 * @since 1.0.0
+		 * @return void
+		 */
+		public function controls_scripts() {
+
+			// Enqueue JS.
+			wp_enqueue_script( 'astra-theme-customizer-reset', ASTRA_CUSTOMIZER_RESET_URI . 'assets/js/customizer-reset.js', array( 'jquery', 'astra-customizer-controls-toggle-js' ), null, true );
+
+			// Add localize JS.
+			wp_localize_script( 'astra-theme-customizer-reset', 'astraCustomizer', apply_filters( 'astra_theme_customizer_reset_js_localize', array(
+				'customizer' => array(
+					'reset' => array(
+						'stringConfirm' => __( 'Warning! This will remove all the astra theme customizer options!', 'astra-customizer-reset' ),
+						'stringReset'   => __( 'Reset All', 'astra-customizer-reset' ),
+						'nonce'         => wp_create_nonce( 'astra-customizer-reset' ),
+					),
+				),
+			) ) );
+		}
+	}
+}// End if().
+
+/**
+ * Kicking this off by calling 'get_instance()' method
+ */
+Astra_Theme_Customizer_Reset::get_instance();
