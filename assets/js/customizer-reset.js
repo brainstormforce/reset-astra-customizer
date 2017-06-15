@@ -25,7 +25,7 @@
 
 		var container = jQuery( '#customize-header-actions' ),
 			button    = jQuery( '<input type="submit" name="astra-reset" id="astra-reset" class="button-secondary button">' )
-				        .attr( 'value', astraCustomizer.customizer.reset.stringReset )
+				        .attr( 'value', astraThemeCustomizerReset.customizer.reset.stringReset )
 				        .css({
 				            'float': 'right',
 				            'margin-top': '9px'
@@ -36,15 +36,15 @@
 	        event.preventDefault();
 
 	        // Reset all confirm?
-	        if ( confirm( astraCustomizer.customizer.reset.stringConfirm ) ) {
+	        if ( confirm( astraThemeCustomizerReset.customizer.reset.stringConfirm ) ) {
 
 		        // Enable loader.
 		    	container.find( '.spinner' ).addClass( 'is-active' );
 
 		        var data = {
 		            wp_customize: 'on',
-		            action: 'astra_customizer_reset',
-		            nonce: astraCustomizer.customizer.reset.nonce
+		            action: 'astra_theme_customizer_reset',
+		            nonce: astraThemeCustomizerReset.customizer.reset.nonce
 		        };
 
 		        // Disable button.
