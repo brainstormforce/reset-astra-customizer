@@ -95,7 +95,7 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
 
 			// Reset option 'astra-settings'.
 			delete_option( ASTRA_THEME_SETTINGS );
-			
+
 			wp_send_json_error( 'pass' );
 
 			wp_die();
