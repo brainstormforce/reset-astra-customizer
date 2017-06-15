@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Astra Customizer Reset
- * Plugin URI: http://www.ultimatebeaver.com/
+ * Plugin URI: https://wpastra.com/
  * Description: Reset astra theme customizer options.
  * Version: 1.0.0
  * Author: Brainstorm Force
