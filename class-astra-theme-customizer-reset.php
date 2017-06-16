@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Astra Customizer Reset
  * Plugin URI: https://wpastra.com/
- * Description: Reset astra theme customizer options.
+ * Description: Reset the Astra theme customizer options from customizer interface.
  * Version: 1.0.0
  * Author: Brainstorm Force
  * Author URI: http://www.brainstormforce.com
