@@ -93,8 +93,20 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
 			// Validate nonce.
 			check_ajax_referer( 'astra-theme-customizer-reset', 'nonce' );
 
+			$default_setting = array();
+			if( defined( 'ASTRA_THEME_VERSION' ) ) {
+				$default_setting['theme-auto-version'] = ASTRA_THEME_VERSION;
+			}
+			if( defined( 'ASTRA_EXT_VER' ) ) {
+				$default_setting['astra-plus-auto-version'] = ASTRA_EXT_VER;
+			}
+
 			// Reset option 'astra-settings'.
-			delete_option( ASTRA_THEME_SETTINGS );
+			if( count( $default_setting ) > 0 ) {
+				update_option( ASTRA_THEME_SETTINGS, $default_setting );
+			} else {
+				delete_option( ASTRA_THEME_SETTINGS );
+			}
 
 			wp_send_json_error( 'pass' );
 
