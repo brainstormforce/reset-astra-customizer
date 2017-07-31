@@ -98,7 +98,7 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
 				$default_setting['theme-auto-version'] = ASTRA_THEME_VERSION;
 			}
 			if( defined( 'ASTRA_EXT_VER' ) ) {
-				$default_setting['astra-plus-auto-version'] = ASTRA_EXT_VER;
+				$default_setting['astra-addon-auto-version'] = ASTRA_EXT_VER;
 			}
 
 			// Reset option 'astra-settings'.
