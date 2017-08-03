@@ -1,7 +1,7 @@
 === Astra Customizer Reset ===
 Contributors: brainstormforce, Mahesh901122, dineshc
 Tags: astra theme, customizer reset, reset astra customizer
-Tested up to: 4.8
+Tested up to: 4.8.1
 Stable tag: 1.0.1
 Requires at least: 4.4
 
