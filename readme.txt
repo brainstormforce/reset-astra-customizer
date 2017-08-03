@@ -1,4 +1,4 @@
-=== Reset Astra Customizer ===
+=== Astra Customizer Reset ===
 Contributors: brainstormforce, Mahesh901122, dineshc
 Tags: astra theme, customizer reset, reset astra customizer
 Tested up to: 4.8
