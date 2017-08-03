@@ -18,7 +18,7 @@ define( 'ASTRA_THEME_CUSTOMIZER_RESET_URI', plugins_url( '/', __FILE__ ) );
  *
  * @since 1.0.0
  */
-if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
+if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 
 	/**
 	 * Astra Customizer Reset
@@ -60,9 +60,9 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
 		 */
 		public function __construct() {
 
-			add_action( 'wp_ajax_astra_theme_customizer_reset',  	array( $this, 'ajax_customizer_reset' ) );
-			add_action( 'customize_controls_enqueue_scripts',   	array( $this, 'controls_scripts' ) );
-			add_action( 'customize_register', 						array( $this, 'customize_register' ) );
+			add_action( 'wp_ajax_astra_theme_customizer_reset', array( $this, 'ajax_customizer_reset' ) );
+			add_action( 'customize_controls_enqueue_scripts',   array( $this, 'controls_scripts' ) );
+			add_action( 'customize_register',                   array( $this, 'customize_register' ) );
 
 		}
 
@@ -93,19 +93,22 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
 			// Validate nonce.
 			check_ajax_referer( 'astra-theme-customizer-reset', 'nonce' );
 
-			$default_setting = array();
-			if( defined( 'ASTRA_THEME_VERSION' ) ) {
-				$default_setting['theme-auto-version'] = ASTRA_THEME_VERSION;
-			}
-			if( defined( 'ASTRA_EXT_VER' ) ) {
-				$default_setting['astra-addon-auto-version'] = ASTRA_EXT_VER;
-			}
-
 			// Reset option 'astra-settings'.
-			if( count( $default_setting ) > 0 ) {
-				update_option( ASTRA_THEME_SETTINGS, $default_setting );
-			} else {
-				delete_option( ASTRA_THEME_SETTINGS );
+			if ( defined( 'ASTRA_THEME_SETTINGS' ) ) {
+
+				$default_setting = array();
+				if ( defined( 'ASTRA_THEME_VERSION' ) ) {
+					$default_setting['theme-auto-version'] = ASTRA_THEME_VERSION;
+				}
+				if ( defined( 'ASTRA_EXT_VER' ) ) {
+					$default_setting['astra-addon-auto-version'] = ASTRA_EXT_VER;
+				}
+
+				if ( ! empty( $default_setting ) ) {
+					update_option( ASTRA_THEME_SETTINGS, $default_setting );
+				} else {
+					delete_option( ASTRA_THEME_SETTINGS );
+				}
 			}
 
 			wp_send_json_error( 'pass' );
@@ -128,7 +131,7 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
 			wp_localize_script( 'astra-theme-customizer-reset', 'astraThemeCustomizerReset', apply_filters( 'astra_theme_customizer_reset_js_localize', array(
 				'customizer' => array(
 					'reset' => array(
-						'stringConfirm' => __( 'Warning! This will remove all the astra theme customizer options!', 'astra-customizer-reset' ),
+						'stringConfirm' => __( 'Warning! This will remove all the Astra theme customizer options!', 'astra-customizer-reset' ),
 						'stringReset'   => __( 'Reset All', 'astra-customizer-reset' ),
 						'nonce'         => wp_create_nonce( 'astra-theme-customizer-reset' ),
 					),
@@ -136,7 +139,8 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) {
 			) ) );
 		}
 	}
-}// End if().
+
+endif; // End if().
 
 /**
  * Kicking this off by calling 'get_instance()' method
