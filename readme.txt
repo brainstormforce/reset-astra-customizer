@@ -1,6 +1,6 @@
-=== Astra Customizer Reset ===
-Contributors: brainstormforce, Mahesh901122
-Tags: astra theme, customizer reset, astra customizer reset
+=== Reset Astra Customizer ===
+Contributors: brainstormforce, Mahesh901122, dineshc
+Tags: astra theme, customizer reset, reset astra customizer
 Tested up to: 4.8
 Stable tag: trunk
 Requires at least: 4.4
