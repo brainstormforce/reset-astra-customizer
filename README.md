@@ -1,22 +1,25 @@
 # Astra Customizer Reset #
 **Contributors:** [brainstormforce](https://profiles.wordpress.org/brainstormforce)  
-**Tags:** astra theme, customizer reset, reset astra customizer  
-**Tested up to:** 5.0  
+**Tags:** astra theme, customizer reset, reset astra customizer, reset astra theme  
+**Tested up to:** 5.1  
 **Stable tag:** 1.0.1  
 **Requires at least:** 4.4  
 
-Reset the Astra theme customizer options from customizer interface.
+This plugin helps to reset customizer settings for the Astra theme in a single click.
 
 ## Description ##
-The Customizer Astra Theme Customizer reset plugin allows you to reset your Astra theme customizer settings from directly within the customizer interface.
 
-## Changelog ##
+Astra Customizer Reset plugin will reset all customizer settings in one click. The plugin will serve to <a href="https://wordpress.org/themes/astra/" target="_blank"> Astra </a>WordPress theme only. 
 
-### 1.0.1 ###
-* Fix: The stored version number of the theme is not resetted now. This will still be retained after reset.
+It provides a “Reset" button in the customizer. Clicking this button will set Astra theme customizer options to default.
 
-### 1.0.0 ###
-* Initial release.
+### When it can be used? ###
+
+This is helpful when you experiment with various customizer options to explore the power of the theme and then want to start over. OR wish to set a new design line for the website.
+
+The reset button will take you back at the initial state with the theme. 
+
+This will affect only customizer settings like layouts, typography, colors, buttons, etc.
 
 ## Installation ##
 
@@ -25,6 +28,23 @@ The Customizer Astra Theme Customizer reset plugin allows you to reset your Astr
 
 ## Frequently Asked Questions ##
 
-### Where to find the customizer reset link? ###
+### Where to find a customizer reset button? ###
 
-Goto customizer from Appearance -> Customizer. The Reset All button is appear behind the Save button @see http://bsf.io/kh1v5
+Once you install and activate this plugin, go to Appearance > Customize. The reset button will appear at the top of the customizer.
+
+### Can I reverse customizer reset action? ###
+
+No! Once you reset the customizer settings you can not revert it back. You will have to manually set all the choices.
+
+## Screenshots ##
+
+1. Visit Astra theme customizer
+2. Astra Customizer Reset Button
+
+## Changelog ##
+
+### 1.0.1 ###
+* Fix: The stored version number of the theme is not resetted now. This will still be retained after reset.
+
+### 1.0.0 ###
+* Initial release.
