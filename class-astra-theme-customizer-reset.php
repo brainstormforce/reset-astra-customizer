@@ -131,8 +131,8 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 			wp_localize_script( 'astra-theme-customizer-reset', 'astraThemeCustomizerReset', apply_filters( 'astra_theme_customizer_reset_js_localize', array(
 				'customizer' => array(
 					'reset' => array(
-						'stringConfirm' => __( 'Warning! This will remove all the Astra theme customizer options!', 'astra-customizer-reset' ),
-						'stringReset'   => __( 'Reset All', 'astra-customizer-reset' ),
+						'stringConfirm' => __( 'Warning! This will remove all the Astra theme customizer options!', 'reset-astra-customizer' ),
+						'stringReset'   => __( 'Reset All', 'reset-astra-customizer' ),
 						'nonce'         => wp_create_nonce( 'astra-theme-customizer-reset' ),
 					),
 				),
