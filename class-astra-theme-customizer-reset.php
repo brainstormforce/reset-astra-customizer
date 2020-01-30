@@ -3,7 +3,7 @@
  * Plugin Name: Astra Customizer Reset
  * Plugin URI: https://wpastra.com/
  * Description: Reset the Astra theme customizer options from customizer interface.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Brainstorm Force
  * Author URI: http://www.brainstormforce.com
  * Text Domain: astra-customizer-reset
@@ -12,7 +12,7 @@
  */
 
 define( 'ASTRA_THEME_CUSTOMIZER_RESET_URI', plugins_url( '/', __FILE__ ) );
-
+define( 'ASTRA_CUSTOMIZER_VERSION', '1.0.2' );
 /**
  * Astra Customizer Reset
  *
@@ -48,7 +48,7 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 		 */
 		public static function get_instance() {
 			if ( ! isset( self::$instance ) ) {
-				self::$instance = new self;
+				self::$instance = new self();
 			}
 			return self::$instance;
 		}
@@ -61,8 +61,8 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 		public function __construct() {
 
 			add_action( 'wp_ajax_astra_theme_customizer_reset', array( $this, 'ajax_customizer_reset' ) );
-			add_action( 'customize_controls_enqueue_scripts',   array( $this, 'controls_scripts' ) );
-			add_action( 'customize_register',                   array( $this, 'customize_register' ) );
+			add_action( 'customize_controls_enqueue_scripts', array( $this, 'controls_scripts' ) );
+			add_action( 'customize_register', array( $this, 'customize_register' ) );
 
 		}
 
@@ -125,22 +125,29 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 		public function controls_scripts() {
 
 			// Enqueue JS.
-			wp_enqueue_script( 'astra-theme-customizer-reset', ASTRA_THEME_CUSTOMIZER_RESET_URI . 'assets/js/customizer-reset.js', array( 'jquery', 'astra-customizer-controls-toggle-js' ), null, true );
+			wp_enqueue_script( 'astra-theme-customizer-reset', ASTRA_THEME_CUSTOMIZER_RESET_URI . 'assets/js/customizer-reset.js', array( 'jquery', 'astra-customizer-controls-toggle-js' ), ASTRA_CUSTOMIZER_VERSION, true );
 
 			// Add localize JS.
-			wp_localize_script( 'astra-theme-customizer-reset', 'astraThemeCustomizerReset', apply_filters( 'astra_theme_customizer_reset_js_localize', array(
-				'customizer' => array(
-					'reset' => array(
-						'stringConfirm' => __( 'Warning! This will remove all the Astra theme customizer options!', 'reset-astra-customizer' ),
-						'stringReset'   => __( 'Reset All', 'reset-astra-customizer' ),
-						'nonce'         => wp_create_nonce( 'astra-theme-customizer-reset' ),
-					),
-				),
-			) ) );
+			wp_localize_script(
+				'astra-theme-customizer-reset',
+				'astraThemeCustomizerReset',
+				apply_filters(
+					'astra_theme_customizer_reset_js_localize',
+					array(
+						'customizer' => array(
+							'reset' => array(
+								'stringConfirm' => __( 'Warning! This will remove all the Astra theme customizer options!', 'astra-customizer-reset' ),
+								'stringReset'   => __( 'Reset All', 'astra-customizer-reset' ),
+								'nonce'         => wp_create_nonce( 'astra-theme-customizer-reset' ),
+							),
+						),
+					)
+				)
+			);
 		}
 	}
 
-endif; // End if().
+endif;
 
 /**
  * Kicking this off by calling 'get_instance()' method
