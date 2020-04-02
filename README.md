@@ -43,6 +43,9 @@ No! Once you reset the customizer settings you can not revert it back. You will 
 
 ## Changelog ##
 
+### 1.0.3 ###
+- Improvement: Updated strings in the warning box.
+
 ### 1.0.2 ###
 - Improvement: Hardened the security of plugin
 - Improvement: Compatibility with latest WordPress PHP_CodeSniffer rules
