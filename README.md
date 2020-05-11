@@ -44,7 +44,7 @@ No! Once you reset the customizer settings you can not revert it back. You will 
 ## Changelog ##
 
 ### 1.0.4 ###
-- Fix: Astra theme name not updating after whitelabel.
+- Fix: White label settings does not get applied for the theme name.
 
 ### 1.0.3 ###
 - Improvement: Updated strings in the warning box.
