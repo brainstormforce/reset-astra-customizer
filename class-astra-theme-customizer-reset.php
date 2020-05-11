@@ -3,7 +3,7 @@
  * Plugin Name: Astra Customizer Reset
  * Plugin URI: https://wpastra.com/
  * Description: Reset the Astra theme customizer options from customizer interface.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Brainstorm Force
  * Author URI: http://www.brainstormforce.com
  * Text Domain: astra-customizer-reset
@@ -12,7 +12,7 @@
  */
 
 define( 'ASTRA_THEME_CUSTOMIZER_RESET_URI', plugins_url( '/', __FILE__ ) );
-define( 'ASTRA_CUSTOMIZER_VERSION', '1.0.3' );
+define( 'ASTRA_CUSTOMIZER_VERSION', '1.0.4' );
 /**
  * Astra Customizer Reset
  *
@@ -124,6 +124,8 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 		 */
 		public function controls_scripts() {
 
+			$theme_name = apply_filters( 'astra_page_title', __( 'Astra', 'astra-customizer-reset' ) );
+
 			// Enqueue JS.
 			wp_enqueue_script( 'astra-theme-customizer-reset', ASTRA_THEME_CUSTOMIZER_RESET_URI . 'assets/js/customizer-reset.js', array( 'jquery', 'astra-customizer-controls-toggle-js' ), ASTRA_CUSTOMIZER_VERSION, true );
 
@@ -136,7 +138,7 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 					array(
 						'customizer' => array(
 							'reset' => array(
-								'stringConfirm' => __( 'Warning! This will remove all the Astra theme customizer settings!', 'astra-customizer-reset' ),
+								'stringConfirm' => __( 'Warning! This will remove all the ' . esc_html( $theme_name ) . ' theme customizer settings!', 'astra-customizer-reset' ), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
 								'stringReset'   => __( 'Reset All', 'astra-customizer-reset' ),
 								'nonce'         => wp_create_nonce( 'astra-theme-customizer-reset' ),
 							),

@@ -1,8 +1,8 @@
 === Astra Customizer Reset ===
 Contributors: brainstormforce
 Tags: astra theme, customizer reset, reset astra customizer, reset astra theme
-Tested up to: 5.4
-Stable tag: 1.0.3
+Tested up to: 5.4.1
+Stable tag: 1.0.4
 Requires at least: 4.4
 
 This plugin helps to reset customizer settings for the Astra theme in a single click.
@@ -42,6 +42,9 @@ No! Once you reset the customizer settings you can not revert it back. You will 
 2. Astra Customizer Reset Button
 
 == Changelog ==
+
+= 1.0.4 =
+- Fix: Astra theme name not updating after whitelabel.
 
 = 1.0.3 =
 - Improvement: Updated strings in the warning box.
