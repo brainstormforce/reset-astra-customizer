@@ -11,6 +11,10 @@
  * @package Astra Customizer Reset
  */
 
+if ( 'astra' !== get_template() ) {
+	return;
+}
+
 define( 'ASTRA_THEME_CUSTOMIZER_RESET_URI', plugins_url( '/', __FILE__ ) );
 define( 'ASTRA_CUSTOMIZER_VERSION', '1.0.4' );
 /**
@@ -63,7 +67,6 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 			add_action( 'wp_ajax_astra_theme_customizer_reset', array( $this, 'ajax_customizer_reset' ) );
 			add_action( 'customize_controls_enqueue_scripts', array( $this, 'controls_scripts' ) );
 			add_action( 'customize_register', array( $this, 'customize_register' ) );
-
 		}
 
 		/**
