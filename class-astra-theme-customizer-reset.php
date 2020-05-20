@@ -141,7 +141,7 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 					array(
 						'customizer' => array(
 							'reset' => array(
-								'stringConfirm' => __( 'Warning! This will remove all the ' . $theme_name . ' theme customizer settings!', 'astra-customizer-reset' ),
+								'stringConfirm' => __( 'Warning! This will remove all the ' . esc_html( $theme_name ) . ' theme customizer settings!', 'astra-customizer-reset' ), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
 								'stringReset'   => __( 'Reset All', 'astra-customizer-reset' ),
 								'nonce'         => wp_create_nonce( 'astra-theme-customizer-reset' ),
 							),
