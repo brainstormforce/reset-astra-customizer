@@ -2,7 +2,7 @@
     "name": "brainstormforce/reset-astra-customizer",
     "description": "Reset customizer settings in Astra Theme",
     "require-dev": {
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
         "wp-coding-standards/wpcs": "dev-master",
         "phpcompatibility/phpcompatibility-wp": "*"
     },
