@@ -113,7 +113,7 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 					delete_option( ASTRA_THEME_SETTINGS );
 				}
 
-				// Delete Global Color Palette and Typography Preset options. 
+				// Delete Global Color Palette and Typography Preset options.
 				delete_option( 'astra-typography-presets' );
 				delete_option( 'astra-color-palettes' );
 			}
