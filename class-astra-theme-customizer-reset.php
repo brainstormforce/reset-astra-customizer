@@ -112,6 +112,10 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 				} else {
 					delete_option( ASTRA_THEME_SETTINGS );
 				}
+
+				// Delete Global Color Palette and Typography Preset options. 
+				delete_option( 'astra-typography-presets' );
+				delete_option( 'astra-color-palettes' );
 			}
 
 			wp_send_json_error( 'pass' );
