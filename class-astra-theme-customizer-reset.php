@@ -3,7 +3,7 @@
  * Plugin Name: Astra Customizer Reset
  * Plugin URI: https://wpastra.com/
  * Description: Reset the Astra theme customizer options from customizer interface.
- * Version: 1.0.4
+ * Version: 1.0.5
  * Author: Brainstorm Force
  * Author URI: http://www.brainstormforce.com
  * Text Domain: astra-customizer-reset
@@ -16,7 +16,7 @@ if ( 'astra' !== get_template() ) {
 }
 
 define( 'ASTRA_THEME_CUSTOMIZER_RESET_URI', plugins_url( '/', __FILE__ ) );
-define( 'ASTRA_CUSTOMIZER_VERSION', '1.0.4' );
+define( 'ASTRA_CUSTOMIZER_VERSION', '1.0.5' );
 /**
  * Astra Customizer Reset
  *
@@ -112,6 +112,10 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 				} else {
 					delete_option( ASTRA_THEME_SETTINGS );
 				}
+
+				// Delete Global Color Palette and Typography Preset options.
+				delete_option( 'astra-typography-presets' );
+				delete_option( 'astra-color-palettes' );
 			}
 
 			wp_send_json_error( 'pass' );
