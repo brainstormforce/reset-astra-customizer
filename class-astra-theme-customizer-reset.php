@@ -131,7 +131,7 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 		 */
 		public function controls_scripts() {
 
-			$theme_name = apply_filters( 'astra_page_title', __( 'Astra', 'astra-customizer-reset', 'reset-astra-customizer' ) ); // phpcs:ignore WordPress.WP.I18n.TooManyFunctionArgs
+			$theme_name = apply_filters( 'astra_page_title', __( 'Astra', 'astra-customizer-reset' ) );
 
 			// Enqueue JS.
 			wp_enqueue_script( 'astra-theme-customizer-reset', ASTRA_THEME_CUSTOMIZER_RESET_URI . 'assets/js/customizer-reset.js', array( 'jquery', 'astra-customizer-controls-toggle-js' ), ASTRA_CUSTOMIZER_VERSION, true );
@@ -145,8 +145,8 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 					array(
 						'customizer' => array(
 							'reset' => array(
-								'stringConfirm' => __( 'Warning! This will remove all the ' . esc_html( $theme_name ) . ' theme customizer settings!', 'astra-customizer-reset', 'reset-astra-customizer' ), // phpcs:ignore 
-								'stringReset'   => __( 'Reset All', 'astra-customizer-reset', 'reset-astra-customizer' ), // phpcs:ignore WordPress.WP.I18n.TooManyFunctionArgs
+								'stringConfirm' => __( 'Warning! This will remove all the ' . esc_html( $theme_name ) . ' theme customizer settings!', 'astra-customizer-reset' ), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
+								'stringReset'   => __( 'Reset All', 'astra-customizer-reset' ),
 								'nonce'         => wp_create_nonce( 'astra-theme-customizer-reset' ),
 							),
 						),
