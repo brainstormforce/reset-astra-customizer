@@ -1,7 +1,7 @@
 # Astra Customizer Reset #
 **Contributors:** [brainstormforce](https://profiles.wordpress.org/brainstormforce)  
 **Tags:** astra theme, customizer reset, reset astra customizer, reset astra theme  
-**Tested up to:** 6.1.1  
+**Tested up to:** 6.2  
 **Stable tag:** 1.0.6  
 **Requires at least:** 4.4  
 
