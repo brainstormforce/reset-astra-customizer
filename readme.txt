@@ -43,9 +43,6 @@ No! Once you reset the customizer settings you can not revert it back. You will 
 
 == Changelog ==
 
-= 1.0.7 =
-- Improvement: Compatibility with WordPress 6.5.
-
 = 1.0.6 =
 - Improvement: Compatibility with Astra 4.0.0.
 
