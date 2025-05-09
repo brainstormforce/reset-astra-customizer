@@ -6,7 +6,7 @@
  * Version: 1.0.6
  * Author: Brainstorm Force
  * Author URI: http://www.brainstormforce.com
- * Text Domain: astra-customizer-reset
+ * Text Domain: reset-astra-customizer
  *
  * @package Astra Customizer Reset
  */
@@ -134,7 +134,7 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 		 */
 		public function controls_scripts() {
 
-			$theme_name = apply_filters( 'astra_page_title', __( 'Astra', 'astra-customizer-reset' ) );
+			$theme_name = apply_filters( 'astra_page_title', __( 'Astra', 'reset-astra-customizer' ) );
 
 			// Enqueue JS.
 			wp_enqueue_script( 'astra-theme-customizer-reset', ASTRA_THEME_CUSTOMIZER_RESET_URI . 'assets/js/customizer-reset.js', array( 'jquery', 'astra-customizer-controls-toggle-js' ), ASTRA_CUSTOMIZER_VERSION, true );
@@ -148,8 +148,8 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 					array(
 						'customizer' => array(
 							'reset' => array(
-								'stringConfirm' => __( 'Warning! This will remove all the ' . esc_html( $theme_name ) . ' theme customizer settings!', 'astra-customizer-reset' ), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
-								'stringReset'   => __( 'Reset All', 'astra-customizer-reset' ),
+								'stringConfirm' => sprintf(esc_html__( 'Warning! This will remove all the %s theme customizer settings!', 'reset-astra-customizer' ),$theme_name), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
+								'stringReset'   => __( 'Reset All', 'reset-astra-customizer' ),
 								'nonce'         => wp_create_nonce( 'astra-theme-customizer-reset' ),
 							),
 						),
