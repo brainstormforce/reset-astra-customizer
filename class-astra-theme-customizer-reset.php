@@ -119,6 +119,9 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 
 				// Delete Astra's 4.0.0 admin setting options.
 				delete_option( 'astra_admin_settings' );
+
+				// Reset the site logo (stored as a theme mod, not in Astra settings).
+				remove_theme_mod( 'custom_logo' );
 			}
 
 			wp_send_json_error( 'pass' );
