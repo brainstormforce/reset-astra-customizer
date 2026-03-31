@@ -23,13 +23,19 @@
      */
     jQuery(document).ready(function($) {
 
-        var container = jQuery('#customize-header-actions'),
-            button = jQuery('<input type="submit" name="astra-reset" id="astra-reset" class="button-secondary button">')
-            .attr('value', astraThemeCustomizerReset.customizer.reset.stringReset)
-            .css({
-                'float': 'right',
-                'margin-top': '9px'
-            });
+        var headerActions = jQuery('#customize-header-actions'),
+            saveWrapper   = jQuery('#customize-save-button-wrapper'),
+            spinner       = headerActions.find('.spinner'),
+            button        = jQuery('<input type="submit" name="astra-reset" id="astra-reset">')
+                .attr('value', astraThemeCustomizerReset.customizer.reset.stringReset)
+                .addClass('button button-secondary save')
+                .css({
+                    'float':         'left',
+                    'margin-top':    '0',
+                    'margin-right':  '4px',
+                    'border-radius': '3px',
+                    'box-shadow':    'none'
+                });
 
         // Process on click.
         button.on('click', function(event) {
@@ -39,7 +45,7 @@
             if (confirm(astraThemeCustomizerReset.customizer.reset.stringConfirm)) {
 
                 // Enable loader.
-                container.find('.spinner').addClass('is-active');
+                spinner.addClass('is-active');
 
                 var data = {
                     wp_customize: 'on',
@@ -66,7 +72,12 @@
             }
         });
 
-        container.append(button);
+        // Insert after the save/publish button, inside the same wrapper.
+        if ( saveWrapper.length ) {
+            saveWrapper.find('.save').first().before(button);
+        } else {
+            headerActions.append(button);
+        }
     });
 
 })(jQuery);
