@@ -23,16 +23,18 @@
      */
     jQuery(document).ready(function($) {
 
-        var headerActions = jQuery('#customize-header-actions'),
+        var isRTL         = jQuery('body').hasClass('rtl'),
+            headerActions = jQuery('#customize-header-actions'),
             saveWrapper   = jQuery('#customize-save-button-wrapper'),
             spinner       = headerActions.find('.spinner'),
             button        = jQuery('<input type="submit" name="astra-reset" id="astra-reset">')
                 .attr('value', astraThemeCustomizerReset.customizer.reset.stringReset)
                 .addClass('button button-secondary save')
                 .css({
-                    'float':         'left',
+                    'float':         isRTL ? 'right' : 'left',
                     'margin-top':    '0',
-                    'margin-right':  '4px',
+                    'margin-right':  isRTL ? '0'   : '4px',
+                    'margin-left':   isRTL ? '4px' : '0',
                     'border-radius': '3px',
                     'box-shadow':    'none'
                 });
@@ -72,7 +74,9 @@
             }
         });
 
-        // Insert after the save/publish button, inside the same wrapper.
+        // In both LTR and RTL, insert before the Publish button in DOM order.
+        // LTR: float left  → visual [Reset All][Publish]
+        // RTL: float right → visual [Publish][Reset All], reading right-to-left: Reset All first.
         if ( saveWrapper.length ) {
             saveWrapper.find('.save').first().before(button);
         } else {
