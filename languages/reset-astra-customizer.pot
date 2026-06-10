@@ -26,7 +26,7 @@ msgstr ""
 "X-Generator: grunt-wp-i18n1.0.2\n"
 
 #: class-astra-theme-customizer-reset.php:140
-msgid "Astra"
+msgid "Warning! This will remove all the Astra theme customizer options!"
 msgstr ""
 
 #: class-astra-theme-customizer-reset.php:155
