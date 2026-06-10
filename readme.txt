@@ -43,6 +43,9 @@ No! Once you reset the customizer settings you can not revert it back. You will 
 
 == Changelog ==
 
+= 1.0.7 =
+- Fix: Site logo (custom_logo) not being reset when using the customizer reset button.
+
 = 1.0.6 =
 - Improvement: Compatibility with Astra 4.0.0.
 
