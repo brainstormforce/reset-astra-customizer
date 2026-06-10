@@ -1,6 +1,6 @@
 {
   "name": "reset-astra-customizer",
-  "version": "1.0.1",
+  "version": "1.0.7",
   "main": "Gruntfile.js",
   "author": "Brainstorm Force",
   "devDependencies": {
