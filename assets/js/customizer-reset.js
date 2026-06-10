@@ -36,7 +36,9 @@
                     'margin-right':  isRTL ? '0'   : '4px',
                     'margin-left':   isRTL ? '4px' : '0',
                     'border-radius': '3px',
-                    'box-shadow':    'none'
+                    'box-shadow':    'none',
+                    'line-height':   1,
+                    'min-height':    '32px',
                 });
 
         // Process on click.
