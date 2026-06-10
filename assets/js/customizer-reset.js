@@ -23,13 +23,21 @@
      */
     jQuery(document).ready(function($) {
 
-        var container = jQuery('#customize-header-actions'),
-            button = jQuery('<input type="submit" name="astra-reset" id="astra-reset" class="button-secondary button">')
-            .attr('value', astraThemeCustomizerReset.customizer.reset.stringReset)
-            .css({
-                'float': 'right',
-                'margin-top': '9px'
-            });
+        var isRTL         = jQuery('body').hasClass('rtl'),
+            headerActions = jQuery('#customize-header-actions'),
+            saveWrapper   = jQuery('#customize-save-button-wrapper'),
+            spinner       = headerActions.find('.spinner'),
+            button        = jQuery('<input type="submit" name="astra-reset" id="astra-reset">')
+                .attr('value', astraThemeCustomizerReset.customizer.reset.stringReset)
+                .addClass('button button-secondary save')
+                .css({
+                    'float':         isRTL ? 'right' : 'left',
+                    'margin-top':    '0',
+                    'margin-right':  isRTL ? '0'   : '4px',
+                    'margin-left':   isRTL ? '4px' : '0',
+                    'border-radius': '3px',
+                    'box-shadow':    'none'
+                });
 
         // Process on click.
         button.on('click', function(event) {
@@ -39,7 +47,7 @@
             if (confirm(astraThemeCustomizerReset.customizer.reset.stringConfirm)) {
 
                 // Enable loader.
-                container.find('.spinner').addClass('is-active');
+                spinner.addClass('is-active');
 
                 var data = {
                     wp_customize: 'on',
@@ -66,7 +74,14 @@
             }
         });
 
-        container.append(button);
+        // In both LTR and RTL, insert before the Publish button in DOM order.
+        // LTR: float left  → visual [Reset All][Publish]
+        // RTL: float right → visual [Publish][Reset All], reading right-to-left: Reset All first.
+        if ( saveWrapper.length ) {
+            saveWrapper.find('.save').first().before(button);
+        } else {
+            headerActions.append(button);
+        }
     });
 
 })(jQuery);
