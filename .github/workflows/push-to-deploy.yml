@@ -7,6 +7,7 @@ jobs:
   tag:
     name: New tag
     runs-on: ubuntu-latest
+    environment: production
     steps:
     - uses: actions/checkout@master
     - name: WordPress Plugin Deploy
