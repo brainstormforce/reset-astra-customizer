@@ -152,11 +152,11 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 					array(
 						'customizer' => array(
 							'reset' => array(
-								'stringConfirm'     => __( 'This will reset all the ' . esc_html( $theme_name ) . ' theme customizer settings in the preview. Click Publish to save the reset, or leave the Customizer to cancel it.', 'astra-customizer-reset' ), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
-								'stringReset'       => __( 'Reset All', 'astra-customizer-reset' ),
-								'stringNotice'      => __( 'Astra settings are reset in the preview only. Click Publish to save the reset, or close the Customizer to cancel it.', 'astra-customizer-reset' ),
-								'defaults'          => class_exists( 'Astra_Theme_Options' ) ? Astra_Theme_Options::defaults() : array(),
-								),
+								'stringConfirm' => __( 'This will reset all the ' . esc_html( $theme_name ) . ' theme customizer settings in the preview. Click Publish to save the reset, or leave the Customizer to cancel it.', 'astra-customizer-reset' ), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
+								'stringReset'   => __( 'Reset All', 'astra-customizer-reset' ),
+								'stringNotice'  => __( 'Astra settings are reset in the preview only. Click Publish to save the reset, or close the Customizer to cancel it.', 'astra-customizer-reset' ),
+								'defaults'      => class_exists( 'Astra_Theme_Options' ) ? Astra_Theme_Options::defaults() : array(),
+							),
 						),
 					)
 				)
