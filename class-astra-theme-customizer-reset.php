@@ -30,20 +30,28 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 	class Astra_Theme_Customizer_Reset {
 
 		/**
+		 * ID of the Customizer setting used as the "reset pending" flag.
+		 *
+		 * @since x.x.x
+		 * @var string
+		 */
+		const PENDING_SETTING = 'astra-customizer-reset-pending';
+
+		/**
+		 * Setting type of the flag. It has no storage of its own.
+		 *
+		 * @since x.x.x
+		 * @var string
+		 */
+		const PENDING_SETTING_TYPE = 'astra_customizer_reset';
+
+		/**
 		 * Member Variable
 		 *
 		 * @since 1.0.0
 		 * @var $instance
 		 */
 		private static $instance;
-
-		/**
-		 * WordPress Customizer Object
-		 *
-		 * @since 1.0.0
-		 * @var $wp_customize
-		 */
-		private $wp_customize;
 
 		/**
 		 * Initiator
@@ -64,69 +72,62 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 		 */
 		public function __construct() {
 
-			add_action( 'wp_ajax_astra_theme_customizer_reset', array( $this, 'ajax_customizer_reset' ) );
 			add_action( 'customize_controls_enqueue_scripts', array( $this, 'controls_scripts' ) );
 			add_action( 'customize_register', array( $this, 'customize_register' ) );
+			add_action( 'customize_update_' . self::PENDING_SETTING_TYPE, array( $this, 'reset_on_publish' ) );
 		}
 
 		/**
-		 * Customize Register Description
+		 * Register the "reset pending" flag.
 		 *
-		 * @param  object $wp_customize Object of WordPress customizer.
+		 * The flag is only a signal from the Reset All button. It is not stored.
+		 * When it is published, the options that are not Customizer settings are reset.
+		 *
+		 * @param  WP_Customize_Manager $wp_customize Object of WordPress customizer.
 		 * @return void
 		 * @since 1.0.0
 		 */
 		public function customize_register( $wp_customize ) {
-			$this->wp_customize = $wp_customize;
+			$wp_customize->add_setting(
+				self::PENDING_SETTING,
+				array(
+					'type'              => self::PENDING_SETTING_TYPE,
+					'default'           => '',
+					'transport'         => 'postMessage',
+					'capability'        => 'edit_theme_options',
+					'sanitize_callback' => array( $this, 'sanitize_pending' ),
+				)
+			);
 		}
 
 		/**
-		 * AJAX Customizer Reset
+		 * Sanitize the "reset pending" flag.
 		 *
-		 * @since 1.0.0
-		 * @return void
+		 * @param  mixed $value Value sent by the Customizer.
+		 * @return string
+		 * @since x.x.x
 		 */
-		public function ajax_customizer_reset() {
+		public function sanitize_pending( $value ) {
+			return '1' === (string) $value ? '1' : '';
+		}
 
-			// Request come from a customizer preview?
-			if ( ! $this->wp_customize->is_preview() ) {
-				wp_send_json_error( 'fail' );
+		/**
+		 * Reset the options that are not Customizer settings.
+		 *
+		 * Runs when the user clicks Publish after using Reset All.
+		 *
+		 * @param  string $value Value of the "reset pending" flag.
+		 * @return void
+		 * @since x.x.x
+		 */
+		public function reset_on_publish( $value ) {
+
+			if ( '1' !== $value || ! current_user_can( 'edit_theme_options' ) ) {
+				return;
 			}
 
-			// Validate nonce.
-			check_ajax_referer( 'astra-theme-customizer-reset', 'nonce' );
-
-			// Reset option 'astra-settings'.
-			if ( defined( 'ASTRA_THEME_SETTINGS' ) ) {
-
-				$default_setting = array();
-				if ( defined( 'ASTRA_THEME_VERSION' ) ) {
-					$default_setting['theme-auto-version'] = ASTRA_THEME_VERSION;
-				}
-				if ( defined( 'ASTRA_EXT_VER' ) ) {
-					$default_setting['astra-addon-auto-version'] = ASTRA_EXT_VER;
-				}
-
-				if ( ! empty( $default_setting ) ) {
-					update_option( ASTRA_THEME_SETTINGS, $default_setting );
-				} else {
-					delete_option( ASTRA_THEME_SETTINGS );
-				}
-
-				// Delete Global Color Palette and Typography Preset options.
-				delete_option( 'astra-typography-presets' );
-				delete_option( 'astra-color-palettes' );
-
-				// Delete Astra's 4.0.0 admin setting options.
-				delete_option( 'astra_admin_settings' );
-
-				// Reset the site logo (stored as a theme mod, not in Astra settings).
-				remove_theme_mod( 'custom_logo' );
-			}
-
-			wp_send_json_error( 'pass' );
-
-			wp_die();
+			// Delete Astra's 4.0.0 admin setting options.
+			delete_option( 'astra_admin_settings' );
 		}
 
 		/**
@@ -140,7 +141,7 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 			$theme_name = apply_filters( 'astra_page_title', __( 'Astra', 'astra-customizer-reset' ) );
 
 			// Enqueue JS.
-			wp_enqueue_script( 'astra-theme-customizer-reset', ASTRA_THEME_CUSTOMIZER_RESET_URI . 'assets/js/customizer-reset.js', array( 'jquery', 'astra-customizer-controls-toggle-js' ), ASTRA_CUSTOMIZER_VERSION, true );
+			wp_enqueue_script( 'astra-theme-customizer-reset', ASTRA_THEME_CUSTOMIZER_RESET_URI . 'assets/js/customizer-reset.js', array( 'jquery', 'wp-a11y', 'customize-controls', 'astra-customizer-controls-toggle-js' ), ASTRA_CUSTOMIZER_VERSION, true );
 
 			// Add localize JS.
 			wp_localize_script(
@@ -151,9 +152,10 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 					array(
 						'customizer' => array(
 							'reset' => array(
-								'stringConfirm' => __( 'Warning! This will remove all the ' . esc_html( $theme_name ) . ' theme customizer settings!', 'astra-customizer-reset' ), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
+								'stringConfirm' => __( 'This will reset all the ' . esc_html( $theme_name ) . ' theme customizer settings in the preview. Click Publish to save the reset, or leave the Customizer to cancel it.', 'astra-customizer-reset' ), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
 								'stringReset'   => __( 'Reset All', 'astra-customizer-reset' ),
-								'nonce'         => wp_create_nonce( 'astra-theme-customizer-reset' ),
+								'stringNotice'  => __( 'Astra settings are reset in the preview only. Click Publish to save the reset, or close the Customizer to cancel it.', 'astra-customizer-reset' ),
+								'defaults'      => class_exists( 'Astra_Theme_Options' ) ? Astra_Theme_Options::defaults() : array(),
 							),
 						),
 					)

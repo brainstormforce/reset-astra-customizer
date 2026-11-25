@@ -26,7 +26,6 @@
         var isRTL         = jQuery('body').hasClass('rtl'),
             headerActions = jQuery('#customize-header-actions'),
             saveWrapper   = jQuery('#customize-save-button-wrapper'),
-            spinner       = headerActions.find('.spinner'),
             button        = jQuery('<input type="submit" name="astra-reset" id="astra-reset">')
                 .attr('value', astraThemeCustomizerReset.customizer.reset.stringReset)
                 .addClass('button button-secondary save')
@@ -41,39 +40,77 @@
                     'min-height':    '32px',
                 });
 
+        var prefix     = 'astra-settings[',
+            noticeCode = 'astra_customizer_reset_pending';
+
+        /**
+         * Reset the Astra settings in the Customizer preview only.
+         *
+         * Nothing is saved to the database here. The values are saved
+         * when the user clicks the Publish button.
+         */
+        function resetInPreview() {
+
+            var defaults = astraThemeCustomizerReset.customizer.reset.defaults || {};
+
+            wp.customize.each(function(setting) {
+
+                // Notice boxes only show a message and hold no value.
+                if (0 !== setting.id.indexOf(prefix) || -1 !== setting.id.indexOf('ast-callback-notice')) {
+                    return;
+                }
+
+                var key = setting.id.slice(prefix.length, -1);
+
+                // Settings without a default (for example logos) are emptied.
+                var value = defaults.hasOwnProperty(key) ? defaults[key] : '';
+
+                // Copy the value so the defaults list is never changed by reference.
+                setting.set(JSON.parse(JSON.stringify(value)));
+            });
+
+            // Typography presets are removed by the original reset, so empty them here too.
+            if (wp.customize.has('astra-typography-presets')) {
+                wp.customize('astra-typography-presets').set('');
+            }
+
+            // The site logo is a theme mod and has no registered default.
+            if (wp.customize.has('custom_logo')) {
+                wp.customize('custom_logo').set('');
+            }
+
+            // Tell the server to also reset the Astra admin settings on Publish.
+            if (wp.customize.has('astra-customizer-reset-pending')) {
+                wp.customize('astra-customizer-reset-pending').set('1');
+            }
+        }
+
         // Process on click.
         button.on('click', function(event) {
             event.preventDefault();
 
             // Reset all confirm?
             if (confirm(astraThemeCustomizerReset.customizer.reset.stringConfirm)) {
+                resetInPreview();
 
-                // Enable loader.
-                spinner.addClass('is-active');
-
-                var data = {
-                    wp_customize: 'on',
-                    action: 'astra_theme_customizer_reset',
-                    nonce: astraThemeCustomizerReset.customizer.reset.nonce
-                };
-
-                // Disable button.
+                // Show that the reset is only in the preview until Publish is clicked.
                 button.attr('disabled', 'disabled');
 
-                // Process AJAX.
-                jQuery.post(ajaxurl, data, function(result) {
-
-                    // If pass then trigger the state 'saved'.
-                    if ('pass' === result.data) {
-                        wp.customize.state('saved').set(true);
-                    }
-
-                    var Url = window.location.href;
-                    Url = Url.split("?")[0];
-                    window.location.href = Url;
-
-                });
+                wp.customize.notifications.add(
+                    new wp.customize.Notification(noticeCode, {
+                        type: 'info',
+                        message: astraThemeCustomizerReset.customizer.reset.stringNotice,
+                        dismissible: true
+                    })
+                );
+                wp.a11y.speak(astraThemeCustomizerReset.customizer.reset.stringNotice);
             }
+        });
+
+        // After Publish the reset is saved, so the button can be used again.
+        wp.customize.bind('saved', function() {
+            button.removeAttr('disabled');
+            wp.customize.notifications.remove(noticeCode);
         });
 
         // In both LTR and RTL, insert before the Publish button in DOM order.
