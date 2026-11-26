@@ -4,10 +4,10 @@
 
 Astra Customizer Reset is a WordPress plugin by Brainstorm Force. Reset Astra theme customizer options from the customizer interface.
 
-- **Version:** 1.0.6
+- **Version:** 1.1.0
 - **Text Domain:** astra-customizer-reset
 - **Main File:** class-astra-theme-customizer-reset.php
-- **Requires:** WordPress, PHP 5.6+
+- **Requires:** WordPress 4.9+, PHP 5.6+
 
 ## Tech Stack
 

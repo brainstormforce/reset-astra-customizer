@@ -2,8 +2,8 @@
 Contributors: brainstormforce
 Tags: astra theme, customizer reset, reset astra customizer, reset astra theme
 Tested up to: 7.1
-Stable tag: 1.0.7
-Requires at least: 4.4
+Stable tag: 1.1.0
+Requires at least: 4.9
 
 This plugin helps to reset customizer settings for the Astra theme in a single click.
 
@@ -30,11 +30,13 @@ This will affect only customizer settings like layouts, typography, colors, butt
 
 = Where to find a customizer reset button? =
 
-Once you install and activate this plugin, go to Appearance > Customize. The reset button will appear at the top of the customizer.
+Once you install and activate this plugin, go to Appearance > Customize. The Reset All button will appear at the top of the customizer, next to Publish. Click it to choose how to reset.
 
 = Can I reverse customizer reset action? =
 
-No! Once you reset the customizer settings you can not revert it back. You will have to manually set all the choices.
+Use "Reset in Preview" if you are not sure. It shows the default settings in the preview only. Close or reload the customizer without clicking Publish and your settings stay as they were.
+
+Once a reset is published, or if you use "Reset and Publish Now", it can not be reverted. You will have to set all the choices again by hand.
 
 == Screenshots ==
 
@@ -42,6 +44,12 @@ No! Once you reset the customizer settings you can not revert it back. You will 
 2. Astra Customizer Reset Button
 
 == Changelog ==
+
+= 1.1.0 =
+- New: Reset All now opens a menu with two options: "Reset in Preview" and "Reset and Publish Now".
+- New: Reset in Preview shows the default settings first. Your live site does not change until you click Publish.
+- New: The Reset All menu links to export a backup first with the Import / Export Customizer Settings plugin.
+- Improvement: The Reset All menu works with the keyboard and screen readers.
 
 = 1.0.7 =
 - Fix: Reset All button layout broken in WordPress 7.0+ Customizer.

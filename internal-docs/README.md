@@ -7,7 +7,7 @@
 | Key | Value |
 |-----|-------|
 | **Plugin Name** | Astra Customizer Reset |
-| **Version** | 1.0.6 |
+| **Version** | 1.1.0 |
 | **Text Domain** | astra-customizer-reset |
 | **Main File** | `class-astra-theme-customizer-reset.php` |
 | **PHP Files** | 1 |
