@@ -7,7 +7,7 @@ Astra Customizer Reset is a WordPress plugin by Brainstorm Force. Reset Astra th
 - **Version:** 1.1.0
 - **Text Domain:** astra-customizer-reset
 - **Main File:** class-astra-theme-customizer-reset.php
-- **Requires:** WordPress 4.9+, PHP 5.6+
+- **Requires:** WordPress 5.3+, PHP 5.6+
 
 ## Tech Stack
 
@@ -26,7 +26,7 @@ composer install
 # Build minified + RTL assets (run after editing assets/*/unminified/)
 npm run build            # = npx grunt minify (rtlcss, uglify, cssmin)
 
-# Build (i18n + readme)
+# Build everything: minify + i18n + readme
 npx grunt
 
 # Generate translations

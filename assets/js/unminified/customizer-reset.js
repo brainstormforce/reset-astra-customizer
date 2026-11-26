@@ -47,6 +47,20 @@
 	const clone = ( value ) => JSON.parse( JSON.stringify( value ) );
 
 	/**
+	 * Show that a reset is in the preview only until Publish is clicked.
+	 */
+	const showPendingNotice = () => {
+		api.notifications.add(
+			new api.Notification( NOTICE, {
+				type: 'info',
+				message: l10n.stringNotice,
+				dismissible: false,
+			} )
+		);
+		// Core announces new notifications to screen readers itself.
+	};
+
+	/**
 	 * Reset in Preview: nothing is saved until the user clicks Publish.
 	 */
 	const resetInPreview = () => {
@@ -62,17 +76,15 @@
 
 			// Settings without a known default are left as they are. Emptying them
 			// breaks controls that expect an object (for example responsive spacing).
-			if ( Object.hasOwn( defaults, key ) ) {
+			if ( Object.prototype.hasOwnProperty.call( defaults, key ) ) {
 				setting.set( clone( defaults[ key ] ) );
 			}
 		} );
 
-		// Global color palette. Keep the built-in presets, reset the palettes.
-		if ( api.has( 'astra-color-palettes' ) && l10n.paletteDefaults?.palettes ) {
-			api( 'astra-color-palettes' ).set( {
-				...api( 'astra-color-palettes' ).get(),
-				...clone( l10n.paletteDefaults ),
-			} );
+		// Global color palette. Replace the whole value, like the full reset that
+		// deletes the option, so custom colors and palette names are removed too.
+		if ( api.has( 'astra-color-palettes' ) && l10n.paletteDefaults && l10n.paletteDefaults.palettes ) {
+			api( 'astra-color-palettes' ).set( clone( l10n.paletteDefaults ) );
 		}
 
 		// Typography presets are removed by the full reset, so empty them here too.
@@ -91,14 +103,7 @@
 			api( PENDING_ID ).set( String( Date.now() ) );
 		}
 
-		api.notifications.add(
-			new api.Notification( NOTICE, {
-				type: 'info',
-				message: l10n.stringNotice,
-				dismissible: false,
-			} )
-		);
-		wp.a11y.speak( l10n.stringNotice );
+		showPendingNotice();
 	};
 
 	/**
@@ -108,7 +113,11 @@
 	 * @param {HTMLButtonElement} button The Reset All button.
 	 */
 	const resetAndPublish = async ( button ) => {
-		document.querySelector( '#customize-header-actions .spinner' )?.classList.add( 'is-active' );
+		const spinner = document.querySelector( '#customize-header-actions .spinner' );
+
+		if ( spinner ) {
+			spinner.classList.add( 'is-active' );
+		}
 		button.disabled = true;
 
 		try {
@@ -123,12 +132,26 @@
 			} );
 			const result = await response.json();
 
-			// Mark as saved so the "leave page" warning does not show.
-			if ( 'pass' === result?.data ) {
-				api.state( 'saved' ).set( true );
+			if ( ! result || ! result.success ) {
+				throw new Error( 'Reset failed' );
 			}
-		} finally {
+
+			// Mark as saved so the "leave page" warning does not show, then reload.
+			api.state( 'saved' ).set( true );
 			window.location.href = window.location.href.split( '?' )[ 0 ];
+		} catch ( error ) {
+			if ( spinner ) {
+				spinner.classList.remove( 'is-active' );
+			}
+			button.disabled = false;
+
+			api.notifications.add(
+				new api.Notification( 'astra_customizer_reset_error', {
+					type: 'error',
+					message: l10n.stringError,
+					dismissible: true,
+				} )
+			);
 		}
 	};
 
@@ -168,10 +191,11 @@
 					class: `astra-reset-menu-item ${ extraClass }`.trim(),
 					tabindex: '-1',
 					'data-action': action,
+					'aria-labelledby': `astra-reset-label-${ action }`,
 					'aria-describedby': `astra-reset-help-${ action }`,
 				},
 				[
-					el( 'span', { class: 'astra-reset-menu-item-label', text: label } ),
+					el( 'span', { class: 'astra-reset-menu-item-label', id: `astra-reset-label-${ action }`, text: label } ),
 					el( 'span', { class: 'astra-reset-menu-item-help', id: `astra-reset-help-${ action }`, text: help } ),
 				]
 			);
@@ -207,14 +231,15 @@
 					class: 'astra-reset-menu-item is-backup',
 					tabindex: '-1',
 					'data-action': 'backup',
+					'aria-labelledby': 'astra-reset-label-backup',
 					'aria-describedby': 'astra-reset-help-backup',
 				},
 				[
-					el( 'span', { class: 'astra-reset-menu-item-label' }, [
+					el( 'span', { class: 'astra-reset-menu-item-label', id: 'astra-reset-label-backup' }, [
 						el( 'span', { class: 'dashicons dashicons-download', 'aria-hidden': 'true' } ),
 						backup.label,
 						el( 'span', { class: 'dashicons dashicons-external', 'aria-hidden': 'true' } ),
-						el( 'span', { class: 'screen-reader-text', text: backup.newTab } ),
+						el( 'span', { class: 'screen-reader-text', text: ` ${ backup.newTab }` } ),
 					] ),
 					el( 'span', { class: 'astra-reset-menu-item-help', id: 'astra-reset-help-backup', text: backup.help } ),
 				]
@@ -230,7 +255,8 @@
 		const openMenu = ( focusIndex = 0 ) => {
 			menu.hidden = false;
 			button.setAttribute( 'aria-expanded', 'true' );
-			items.at( focusIndex )?.focus();
+			// A negative index counts from the end (-1 is the last item).
+			items[ ( focusIndex + items.length ) % items.length ].focus();
 		};
 
 		const closeMenu = ( returnFocus = false ) => {
@@ -265,7 +291,7 @@
 
 		menu.addEventListener( 'keydown', ( event ) => {
 			const index = items.indexOf( document.activeElement );
-			const focus = ( i ) => items.at( i % items.length )?.focus();
+			const focus = ( i ) => items[ ( i + items.length ) % items.length ].focus();
 
 			switch ( event.key ) {
 				case 'ArrowDown':
@@ -317,15 +343,34 @@
 
 				if ( 'preview' === action ) {
 					resetInPreview();
-				} else if ( 'publish' === action && window.confirm( l10n.stringConfirm ) ) {
+				} else if ( 'publish' === action && window.confirm( confirmText() ) ) {
 					resetAndPublish( button );
 				}
 			} )
 		);
 
-		// Once published (or the changes are discarded) the notice is no longer true.
-		api.state( 'saved' ).bind( ( isSaved ) => {
-			if ( isSaved ) {
+		// The "Reset and Publish Now" confirm text, with a warning when a saved
+		// draft or scheduled changeset is loaded: it is not removed by the reset.
+		function confirmText() {
+			const status = api.state( 'changesetStatus' ).get();
+
+			if ( 'draft' === status || 'future' === status ) {
+				return `${ l10n.stringConfirm }\n\n${ l10n.stringConfirmSaved }`;
+			}
+
+			return l10n.stringConfirm;
+		}
+
+		// A changeset that already holds a reset (restored autosave, draft,
+		// scheduled or taken-over changeset) will reset on Publish too, so say so.
+		if ( api.has( PENDING_ID ) && api( PENDING_ID ).get() ) {
+			showPendingNotice();
+		}
+
+		// Once published the reset is saved, so the notice is no longer true. After
+		// Save Draft or Schedule the reset is still pending, so the notice stays.
+		api.bind( 'saved', ( response ) => {
+			if ( response && 'publish' === response.changeset_status ) {
 				api.notifications.remove( NOTICE );
 			}
 		} );

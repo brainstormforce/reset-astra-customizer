@@ -3,15 +3,18 @@ Contributors: brainstormforce
 Tags: astra theme, customizer reset, reset astra customizer, reset astra theme
 Tested up to: 7.1
 Stable tag: 1.1.0
-Requires at least: 4.9
+Requires at least: 5.3
+Requires PHP: 5.6
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin helps to reset customizer settings for the Astra theme in a single click.
+This plugin helps to reset customizer settings for the Astra theme, with a preview before you publish.
 
 == Description ==
 
-Astra Customizer Reset plugin will reset all customizer settings in one click. The plugin will serve to <a href="https://wordpress.org/themes/astra/" target="_blank"> Astra </a>WordPress theme only.
+Astra Customizer Reset plugin resets all Astra customizer settings to their defaults. The plugin will serve to <a href="https://wordpress.org/themes/astra/" target="_blank"> Astra </a>WordPress theme only.
 
-It provides a “Reset" button in the customizer. Clicking this button will set Astra theme customizer options to default.
+It adds a "Reset All" button in the customizer. It opens a menu where you can reset in the preview first and publish when you are happy, or reset and publish right away. It also links to the Import / Export Customizer Settings plugin, so you can export your settings before you reset.
 
 = When it can be used? =
 
@@ -36,12 +39,18 @@ Once you install and activate this plugin, go to Appearance > Customize. The Res
 
 Use "Reset in Preview" if you are not sure. It shows the default settings in the preview only. Close or reload the customizer without clicking Publish and your settings stay as they were.
 
-Once a reset is published, or if you use "Reset and Publish Now", it can not be reverted. You will have to set all the choices again by hand.
+Once a reset is published, or if you use "Reset and Publish Now", it can not be reverted. You will have to set all the choices again by hand. To be safe, export your settings first with the Import / Export Customizer Settings plugin. The Reset All menu links to it ("Export Settings First", or "Back Up Settings First" when the plugin is not active yet).
+
+= What is the difference between "Reset in Preview" and "Reset and Publish Now"? =
+
+"Reset in Preview" resets the settings you can change in the customizer, so you can check the result before you publish. It saves the default values of those settings, so they will not follow changes to the defaults in later Astra versions.
+
+"Reset and Publish Now" removes all saved Astra settings at once, including settings that are not shown in the customizer. This gives you the same clean start as a new site. On sites that were set up with an older version of Astra, some default values can be different from "Reset in Preview".
 
 == Screenshots ==
 
-1. Visit Astra theme customizer
-2. Astra Customizer Reset Button
+1. The Reset All button next to Publish in the Astra customizer
+2. The Reset All menu: Reset in Preview, Reset and Publish Now, and the backup link
 
 == Changelog ==
 

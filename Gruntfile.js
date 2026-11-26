@@ -1,7 +1,7 @@
 module.exports = function( grunt ) {
 
 	'use strict';
-	var banner = '/**\n * <%= pkg.homepage %>\n * Copyright (c) <%= grunt.template.today("yyyy") %>\n * This file is generated automatically. Do not edit.\n */\n';
+
 	// Project configuration
 	grunt.initConfig( {
 
@@ -47,7 +47,12 @@ module.exports = function( grunt ) {
 		// Minify CSS: '{name}.css' to '{name}.min.css' and '{name}-rtl.css' to '{name}.min-rtl.css'.
 		cssmin: {
 			options: {
-				keepSpecialComments: 0,
+				// clean-css 4+: drop all comments, including /*! ones.
+				level: {
+					1: {
+						specialComments: 0,
+					},
+				},
 			},
 			css: {
 				files: [
@@ -73,11 +78,11 @@ module.exports = function( grunt ) {
 
 		addtextdomain: {
 			options: {
-				textdomain: 'reset-astra-customizer',
+				textdomain: 'astra-customizer-reset',
 			},
 			target: {
 				files: {
-					src: [ '*.php', '**/*.php', '!node_modules/**', '!php-tests/**', '!bin/**' ]
+					src: [ '*.php', '**/*.php', '!node_modules/**', '!vendor/**', '!php-tests/**', '!bin/**' ]
 				}
 			}
 		},
@@ -156,7 +161,7 @@ module.exports = function( grunt ) {
 			target: {
 				options: {
 					domainPath: '/languages',
-					mainFile: 'reset-astra-customizer.php',
+					mainFile: 'class-astra-theme-customizer-reset.php',
 					potFilename: 'reset-astra-customizer.pot',
 					potHeaders: {
 						poedit: true,
@@ -178,6 +183,9 @@ module.exports = function( grunt ) {
 	grunt.loadNpmTasks( 'grunt-text-replace' );
 
 	grunt.registerTask( 'i18n', ['addtextdomain', 'makepot'] );
+
+	// Default `grunt`: build assets, translations and README.md.
+	grunt.registerTask( 'default', [ 'minify', 'i18n', 'readme' ] );
 	grunt.registerTask( 'readme', ['wp_readme_to_markdown'] );
 
 	// RTL CSS: `grunt rtl`.

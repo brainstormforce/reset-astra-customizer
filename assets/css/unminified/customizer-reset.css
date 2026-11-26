@@ -78,7 +78,9 @@
 .astra-reset-menu .astra-reset-menu-item:focus {
 	background: #f6f7f7;
 	border-left-color: #2271b1;
-	outline: none;
+	/* Transparent, so it only shows in Windows High Contrast mode. */
+	outline: 2px solid transparent;
+	outline-offset: -2px;
 }
 
 .astra-reset-menu .astra-reset-menu-item:focus-visible {

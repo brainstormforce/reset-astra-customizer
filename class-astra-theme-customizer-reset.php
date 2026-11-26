@@ -7,6 +7,10 @@
  * Author: Brainstorm Force
  * Author URI: http://www.brainstormforce.com
  * Text Domain: astra-customizer-reset
+ * Requires at least: 5.3
+ * Requires PHP: 5.6
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Astra Customizer Reset
  */
@@ -148,8 +152,22 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 				return;
 			}
 
-			// Delete Astra's 4.0.0 admin setting options.
-			delete_option( 'astra_admin_settings' );
+			$this->delete_admin_settings();
+		}
+
+		/**
+		 * Delete Astra's admin settings (added in Astra 4.0.0).
+		 *
+		 * These belong to the Astra dashboard, which needs `manage_options`, so a
+		 * user who can only edit the theme options resets the look but keeps them.
+		 *
+		 * @since 1.1.0
+		 * @return void
+		 */
+		private function delete_admin_settings() {
+			if ( current_user_can( 'manage_options' ) ) {
+				delete_option( 'astra_admin_settings' );
+			}
 		}
 
 		/**
@@ -160,13 +178,18 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 		 */
 		public function ajax_customizer_reset() {
 
-			// Request come from a customizer preview?
-			if ( ! $this->wp_customize->is_preview() ) {
-				wp_send_json_error( 'fail' );
+			// Validate nonce first.
+			check_ajax_referer( 'astra-theme-customizer-reset', 'nonce' );
+
+			if ( ! current_user_can( 'edit_theme_options' ) ) {
+				wp_send_json_error( 'fail', 403 );
 			}
 
-			// Validate nonce.
-			check_ajax_referer( 'astra-theme-customizer-reset', 'nonce' );
+			// Request come from a customizer preview? Without `wp_customize=on`
+			// the Customizer is not loaded and the property is not set.
+			if ( ! $this->wp_customize instanceof WP_Customize_Manager || ! $this->wp_customize->is_preview() ) {
+				wp_send_json_error( 'fail', 400 );
+			}
 
 			// Reset option 'astra-settings'.
 			if ( defined( 'ASTRA_THEME_SETTINGS' ) ) {
@@ -190,15 +213,43 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 				delete_option( 'astra-color-palettes' );
 
 				// Delete Astra's 4.0.0 admin setting options.
-				delete_option( 'astra_admin_settings' );
+				$this->delete_admin_settings();
 
 				// Reset the site logo (stored as a theme mod, not in Astra settings).
 				remove_theme_mod( 'custom_logo' );
+
+				$this->refresh_astra_caches();
 			}
 
-			wp_send_json_error( 'pass' );
+			// 'pass' is kept as the data for scripts that check it.
+			wp_send_json_success( 'pass' );
+		}
 
-			wp_die();
+		/**
+		 * Run Astra's refresh after the options are written directly.
+		 *
+		 * "Reset and Publish Now" does not save through the Customizer, so
+		 * `customize_save_after` never fires. Call the same Astra routines it
+		 * runs: refresh the options cache, regenerate logo sizes, fire
+		 * `astra_customizer_save`, and clear the cached partials config.
+		 *
+		 * @since 1.1.0
+		 * @return void
+		 */
+		private function refresh_astra_caches() {
+			if ( ! class_exists( 'Astra_Customizer' ) || ! is_callable( array( 'Astra_Customizer', 'get_instance' ) ) ) {
+				return;
+			}
+
+			$astra_customizer = Astra_Customizer::get_instance();
+
+			if ( is_callable( array( $astra_customizer, 'customize_save' ) ) ) {
+				$astra_customizer->customize_save();
+			}
+
+			if ( is_callable( array( $astra_customizer, 'delete_cached_partials' ) ) ) {
+				$astra_customizer->delete_cached_partials();
+			}
 		}
 
 		/**
@@ -232,19 +283,21 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 						'customizer' => array(
 							'reset' => array(
 								/* translators: %s: Theme name. */
-								'stringConfirm'     => sprintf( __( 'All %s theme customizer settings will be removed and saved right away. Visitors will see the default settings at once. This cannot be undone. Continue?', 'astra-customizer-reset' ), esc_html( $theme_name ) ),
-								'stringReset'       => __( 'Reset All', 'astra-customizer-reset' ),
-								'stringMenuLabel'   => __( 'Reset options', 'astra-customizer-reset' ),
-								'stringPreview'     => __( 'Reset in Preview', 'astra-customizer-reset' ),
-								'stringPreviewHelp' => __( 'See the default settings first. Click Publish to save them, or close or reload the Customizer to cancel.', 'astra-customizer-reset' ),
-								'stringPublish'     => __( 'Reset and Publish Now', 'astra-customizer-reset' ),
-								'stringPublishHelp' => __( 'Removes all settings and saves right away. Visitors see the default settings at once.', 'astra-customizer-reset' ),
+								'stringConfirm'      => sprintf( __( 'All %s theme customizer settings will be removed and saved right away. Visitors will see the default settings at once. This cannot be undone. Continue?', 'astra-customizer-reset' ), $theme_name ),
+								'stringConfirmSaved' => __( 'This Customizer also has saved changes that are not published yet (a draft or a scheduled change). They will load again after the reset and will be applied when they are published.', 'astra-customizer-reset' ),
+								'stringReset'        => __( 'Reset All', 'astra-customizer-reset' ),
+								'stringMenuLabel'    => __( 'Reset options', 'astra-customizer-reset' ),
+								'stringPreview'      => __( 'Reset in Preview', 'astra-customizer-reset' ),
+								'stringPreviewHelp'  => __( 'See the default settings first. Click Publish to save them, or close or reload the Customizer to cancel.', 'astra-customizer-reset' ),
+								'stringPublish'      => __( 'Reset and Publish Now', 'astra-customizer-reset' ),
+								'stringPublishHelp'  => __( 'Removes all settings and saves right away. Visitors see the default settings at once.', 'astra-customizer-reset' ),
 								/* translators: %s: Theme name. */
-								'stringNotice'      => sprintf( __( '%s settings are reset in the preview only. Click Publish to save the reset, or close or reload the Customizer to cancel it.', 'astra-customizer-reset' ), esc_html( $theme_name ) ),
-								'nonce'             => wp_create_nonce( 'astra-theme-customizer-reset' ),
-								'defaults'          => class_exists( 'Astra_Theme_Options' ) ? Astra_Theme_Options::defaults() : array(),
-								'paletteDefaults'   => class_exists( 'Astra_Global_Palette' ) ? Astra_Global_Palette::get_default_color_palette() : array(),
-								'backup'            => $this->get_backup_nudge(),
+								'stringNotice'       => sprintf( esc_html__( '%s settings are reset in the preview only. Click Publish to save the reset, or close or reload the Customizer to cancel it.', 'astra-customizer-reset' ), esc_html( $theme_name ) ),
+								'stringError'        => esc_html__( 'The settings could not be reset. Please reload the page and try again.', 'astra-customizer-reset' ),
+								'nonce'              => wp_create_nonce( 'astra-theme-customizer-reset' ),
+								'defaults'           => class_exists( 'Astra_Theme_Options' ) ? Astra_Theme_Options::defaults() : array(),
+								'paletteDefaults'    => class_exists( 'Astra_Global_Palette' ) ? Astra_Global_Palette::get_default_color_palette() : array(),
+								'backup'             => $this->get_backup_nudge(),
 							),
 						),
 					)
@@ -285,39 +338,39 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 
 				$nudge['label'] = __( 'Export Settings First', 'astra-customizer-reset' );
 				/* translators: %s: Theme name. */
-				$nudge['help'] = sprintf( __( 'Export a backup from %s > Settings. You can import it on the same screen later to undo a reset.', 'astra-customizer-reset' ), esc_html( $theme_name ) );
-				$nudge['url']  = add_query_arg(
-					array(
-						'page' => $page_slug,
-						'path' => 'settings',
-					),
-					admin_url( 'admin.php' )
+				$nudge['help'] = sprintf( __( 'Export your Customizer settings from %s > Settings. You can import them there later. The site logo is not included.', 'astra-customizer-reset' ), $theme_name );
+				$nudge['url']  = esc_url_raw(
+					add_query_arg(
+						array(
+							'page' => rawurlencode( $page_slug ),
+							'path' => 'settings',
+						),
+						admin_url( 'admin.php' )
+					)
 				);
 
 				return $nudge;
 			}
 
-			if ( ! function_exists( 'get_plugins' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/plugin.php';
-			}
-
 			// Installed but inactive: link to activate it.
-			if ( array_key_exists( $plugin_file, get_plugins() ) ) {
+			if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_file ) ) {
 
 				if ( ! current_user_can( 'activate_plugin', $plugin_file ) ) {
 					return null;
 				}
 
 				/* translators: %s: Plugin name. */
-				$nudge['help'] = sprintf( __( 'Activate %s to export a backup you can import later.', 'astra-customizer-reset' ), $plugin_name );
+				$nudge['help'] = sprintf( __( 'Activate %s to export your Customizer settings and import them later.', 'astra-customizer-reset' ), $plugin_name );
 				// Not wp_nonce_url(): it escapes "&" to "&amp;", which breaks the URL in JS.
-				$nudge['url'] = add_query_arg(
-					array(
-						'action'   => 'activate',
-						'plugin'   => rawurlencode( $plugin_file ),
-						'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $plugin_file ),
-					),
-					self_admin_url( 'plugins.php' )
+				$nudge['url'] = esc_url_raw(
+					add_query_arg(
+						array(
+							'action'   => 'activate',
+							'plugin'   => rawurlencode( $plugin_file ),
+							'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $plugin_file ),
+						),
+						self_admin_url( 'plugins.php' )
+					)
 				);
 
 				return $nudge;
@@ -329,13 +382,15 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 			}
 
 			/* translators: %s: Plugin name. */
-			$nudge['help'] = sprintf( __( 'Install %s to export a backup you can import later.', 'astra-customizer-reset' ), $plugin_name );
-			$nudge['url']  = add_query_arg(
-				array(
-					'tab'    => 'plugin-information',
-					'plugin' => dirname( $plugin_file ),
-				),
-				self_admin_url( 'plugin-install.php' )
+			$nudge['help'] = sprintf( __( 'Install %s to export your Customizer settings and import them later.', 'astra-customizer-reset' ), $plugin_name );
+			$nudge['url']  = esc_url_raw(
+				add_query_arg(
+					array(
+						'tab'    => 'plugin-information',
+						'plugin' => dirname( $plugin_file ),
+					),
+					self_admin_url( 'plugin-install.php' )
+				)
 			);
 
 			return $nudge;
