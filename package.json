@@ -5,10 +5,19 @@
   "author": "Brainstorm Force",
   "devDependencies": {
     "grunt": "^1.5.3",
+    "grunt-bumpup": "^0.6.3",
+    "grunt-contrib-cssmin": "^4.0.0",
     "grunt-contrib-jshint": "^2.1.0",
+    "grunt-contrib-uglify": "^5.2.2",
+    "grunt-rtlcss": "^2.0.2",
+    "grunt-text-replace": "^0.4.0",
     "grunt-wp-i18n": "~1.0.2",
     "grunt-wp-readme-to-markdown": "~2.0.1",
     "lodash": "^4.17.21",
     "minimist": "^1.2.7"
+  },
+  "scripts": {
+    "build": "grunt minify",
+    "build:rtl": "grunt rtl"
   }
 }

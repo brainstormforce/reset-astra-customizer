@@ -211,9 +211,16 @@ if ( ! class_exists( 'Astra_Theme_Customizer_Reset' ) ) :
 
 			$theme_name = apply_filters( 'astra_page_title', __( 'Astra', 'astra-customizer-reset' ) );
 
+			// Load the unminified files when SCRIPT_DEBUG is on, like the Astra theme.
+			// Minified files are built with `npm run build` (grunt minify).
+			$dir_name    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? 'unminified' : 'minified';
+			$file_prefix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+			$rtl_suffix  = is_rtl() ? '-rtl' : '';
+			$assets_uri  = ASTRA_THEME_CUSTOMIZER_RESET_URI . 'assets/';
+
 			// Enqueue CSS and JS.
-			wp_enqueue_style( 'astra-theme-customizer-reset', ASTRA_THEME_CUSTOMIZER_RESET_URI . 'assets/css/customizer-reset.css', array( 'dashicons' ), ASTRA_CUSTOMIZER_VERSION );
-			wp_enqueue_script( 'astra-theme-customizer-reset', ASTRA_THEME_CUSTOMIZER_RESET_URI . 'assets/js/customizer-reset.js', array( 'wp-a11y', 'customize-controls', 'astra-customizer-controls-toggle-js' ), ASTRA_CUSTOMIZER_VERSION, true );
+			wp_enqueue_style( 'astra-theme-customizer-reset', $assets_uri . 'css/' . $dir_name . '/customizer-reset' . $file_prefix . $rtl_suffix . '.css', array( 'dashicons' ), ASTRA_CUSTOMIZER_VERSION );
+			wp_enqueue_script( 'astra-theme-customizer-reset', $assets_uri . 'js/' . $dir_name . '/customizer-reset' . $file_prefix . '.js', array( 'wp-a11y', 'customize-controls', 'astra-customizer-controls-toggle-js' ), ASTRA_CUSTOMIZER_VERSION, true );
 
 			// Add localize JS.
 			wp_localize_script(

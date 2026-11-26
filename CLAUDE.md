@@ -23,6 +23,9 @@ Astra Customizer Reset is a WordPress plugin by Brainstorm Force. Reset Astra th
 npm install
 composer install
 
+# Build minified + RTL assets (run after editing assets/*/unminified/)
+npm run build            # = npx grunt minify (rtlcss, uglify, cssmin)
+
 # Build (i18n + readme)
 npx grunt
 
@@ -41,6 +44,7 @@ npx grunt readme
 This is a WordPress plugin following standard WordPress patterns:
 - Entry point: `class-astra-theme-customizer-reset.php`
 - Constants defined for version, file path, base, dir, and URI
+- Assets follow the Astra theme layout: edit `assets/js/unminified/` and `assets/css/unminified/`, then run `npm run build` to generate `minified/*.min.*` and the `-rtl` CSS (never edit generated files). Commit the generated files: the WordPress.org deploy does not build. The plugin loads unminified files when `SCRIPT_DEBUG` is true, and `-rtl` CSS when `is_rtl()`
 - Classes loaded via `after_setup_theme` or `plugins_loaded` hook
 - Follows WordPress Coding Standards (WPCS)
 

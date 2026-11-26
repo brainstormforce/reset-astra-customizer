@@ -7,6 +7,70 @@ module.exports = function( grunt ) {
 
 		pkg: grunt.file.readJSON( 'package.json' ),
 
+		// Generate '-rtl.css' files from the LTR source CSS.
+		rtlcss: {
+			options: {
+				config: {
+					preserveComments: true,
+					greedy: true,
+				},
+				map: false,
+			},
+			dist: {
+				files: [
+					{
+						expand: true,
+						cwd: 'assets/css/unminified/',
+						src: [ '*.css', '!*-rtl.css' ],
+						dest: 'assets/css/unminified',
+						ext: '-rtl.css',
+					},
+				],
+			},
+		},
+
+		// Minify JS: 'unminified/{name}.js' to 'minified/{name}.min.js'.
+		uglify: {
+			js: {
+				files: [
+					{
+						expand: true,
+						cwd: 'assets/js/unminified',
+						src: [ '*.js' ],
+						dest: 'assets/js/minified',
+						ext: '.min.js',
+					},
+				],
+			},
+		},
+
+		// Minify CSS: '{name}.css' to '{name}.min.css' and '{name}-rtl.css' to '{name}.min-rtl.css'.
+		cssmin: {
+			options: {
+				keepSpecialComments: 0,
+			},
+			css: {
+				files: [
+					{
+						expand: true,
+						cwd: 'assets/css/unminified',
+						src: [ '*.css', '!*-rtl.css' ],
+						dest: 'assets/css/minified',
+						ext: '.min.css',
+					},
+					{
+						expand: true,
+						cwd: 'assets/css/unminified',
+						src: [ '*-rtl.css' ],
+						dest: 'assets/css/minified',
+						rename: function( dest, src ) {
+							return dest + '/' + src.replace( /-rtl\.css$/, '.min-rtl.css' );
+						},
+					},
+				],
+			},
+		},
+
 		addtextdomain: {
 			options: {
 				textdomain: 'reset-astra-customizer',
@@ -105,6 +169,9 @@ module.exports = function( grunt ) {
 		},
 	} );
 
+	grunt.loadNpmTasks( 'grunt-rtlcss' );
+	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
+	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-wp-i18n' );
 	grunt.loadNpmTasks( 'grunt-wp-readme-to-markdown' );
 	grunt.loadNpmTasks( 'grunt-bumpup' );
@@ -112,6 +179,12 @@ module.exports = function( grunt ) {
 
 	grunt.registerTask( 'i18n', ['addtextdomain', 'makepot'] );
 	grunt.registerTask( 'readme', ['wp_readme_to_markdown'] );
+
+	// RTL CSS: `grunt rtl`.
+	grunt.registerTask( 'rtl', [ 'rtlcss' ] );
+
+	// Build assets: `grunt minify` (RTL CSS, then minified JS and CSS).
+	grunt.registerTask( 'minify', [ 'rtl', 'uglify:js', 'cssmin:css' ] );
 
 	// Version Bump `grunt version-bump --ver=<version-number>`
 	grunt.registerTask( 'version-bump', function() {
