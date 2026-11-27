@@ -2,16 +2,19 @@
 Contributors: brainstormforce
 Tags: astra theme, customizer reset, reset astra customizer, reset astra theme
 Tested up to: 7.1
-Stable tag: 1.0.7
-Requires at least: 4.4
+Stable tag: 1.1.0
+Requires at least: 5.3
+Requires PHP: 5.6
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin helps to reset customizer settings for the Astra theme in a single click.
+This plugin helps to reset customizer settings for the Astra theme, with a preview before you publish.
 
 == Description ==
 
-Astra Customizer Reset plugin will reset all customizer settings in one click. The plugin will serve to <a href="https://wordpress.org/themes/astra/" target="_blank"> Astra </a>WordPress theme only.
+Astra Customizer Reset plugin resets all Astra customizer settings to their defaults. The plugin will serve to <a href="https://wordpress.org/themes/astra/" target="_blank"> Astra </a>WordPress theme only.
 
-It provides a “Reset" button in the customizer. Clicking this button will set Astra theme customizer options to default.
+It adds a "Reset All" button in the customizer. It opens a menu where you can reset in the preview first and publish when you are happy, or reset and publish right away. It can also export your settings before you reset, with the free Import / Export Customizer Settings plugin. The menu installs and activates that plugin for you if needed.
 
 = When it can be used? =
 
@@ -30,18 +33,34 @@ This will affect only customizer settings like layouts, typography, colors, butt
 
 = Where to find a customizer reset button? =
 
-Once you install and activate this plugin, go to Appearance > Customize. The reset button will appear at the top of the customizer.
+Once you install and activate this plugin, go to Appearance > Customize. The Reset All button will appear at the top of the customizer, next to Publish. Click it to choose how to reset.
 
 = Can I reverse customizer reset action? =
 
-No! Once you reset the customizer settings you can not revert it back. You will have to manually set all the choices.
+Use "Reset in Preview" if you are not sure. It shows the default settings in the preview only. Close or reload the customizer without clicking Publish and your settings stay as they were.
+
+Once a reset is published, or if you use "Reset and Publish Now", it can not be reverted. You will have to set all the choices again by hand. To be safe, export your settings first. In the Reset All menu, "Export Settings First" downloads your published settings as a file, using the Import / Export Customizer Settings plugin. If that plugin is not active yet, the menu shows "Back Up Settings First", which installs and activates it for you, then downloads the file. To restore the settings, import the file in Astra > Settings.
+
+= What is the difference between "Reset in Preview" and "Reset and Publish Now"? =
+
+Both give the same clean start as a new site. The difference is when the reset is saved.
+
+"Reset in Preview" shows the reset in the preview first. Nothing changes on your live site until you click Publish, and you can still change settings before you publish. It saves the default values of the settings you can change in the customizer, so they will not follow changes to the defaults in later Astra versions.
+
+"Reset and Publish Now" removes all saved Astra settings at once and reloads the customizer. Your live site changes right away.
 
 == Screenshots ==
 
-1. Visit Astra theme customizer
-2. Astra Customizer Reset Button
+1. The Reset All button next to Publish in the Astra customizer
+2. The Reset All menu: Reset in Preview, Export Settings First, and Reset and Publish Now
 
 == Changelog ==
+
+= 1.1.0 =
+- New: Reset All now opens a menu with two options: "Reset in Preview" and "Reset and Publish Now".
+- New: Reset in Preview shows the default settings first. Your live site does not change until you click Publish.
+- New: Export a backup from the Reset All menu before you reset. It installs and activates the Import / Export Customizer Settings plugin if needed.
+- Improvement: The Reset All menu works with the keyboard and screen readers.
 
 = 1.0.7 =
 - Fix: Reset All button layout broken in WordPress 7.0+ Customizer.

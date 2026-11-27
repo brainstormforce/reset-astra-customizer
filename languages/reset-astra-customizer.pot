@@ -1,11 +1,11 @@
-# Copyright (C) 2026
-# This file is distributed under the same license as the  package.
+# Copyright (C) 2026 Brainstorm Force
+# This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: Astra Customizer Reset 1.1.0\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/reset-astra-customizer\n"
-"POT-Creation-Date: 2026-06-10 10:13:53+00:00\n"
+"POT-Creation-Date: 2026-11-27 08:32:40+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,10 +25,182 @@ msgstr ""
 "X-Textdomain-Support: yes\n"
 "X-Generator: grunt-wp-i18n1.0.2\n"
 
-#: class-astra-theme-customizer-reset.php:140
-msgid "Warning! This will remove all the Astra theme customizer options!"
+#: classes/class-astra-theme-customizer-reset-backup.php:109
+msgid "Import / Export Customizer Settings"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:155
+#: classes/class-astra-theme-customizer-reset-backup.php:110
+#: classes/class-astra-theme-customizer-reset.php:65
+msgid "Astra"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:112
+msgid "Back Up Settings First"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:137
+#. translators: %s: Theme name.
+msgid "%s > Settings"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:141
+msgid "Export Settings First"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:143
+#. translators: %s: Theme name.
+msgid ""
+"Downloads your published settings as a file. To restore them, import the "
+"file in %s > Settings. The site logo is not included."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:144
+msgid "Exporting…"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:149
+#. translators: %s: Link to the theme settings page.
+msgid "Settings exported. To restore them later, import the file in %s."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:151
+#. translators: %s: Link to the theme settings page.
+msgid "The settings could not be exported. Please export them from %s."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:155
+#: classes/class-astra-theme-customizer-reset-backup.php:220
+msgid "Plugins"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:166
+#. translators: %s: Plugin name.
+msgid "Activates the %s plugin, then downloads your published settings as a file."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:167
+#: classes/class-astra-theme-customizer-reset-backup.php:215
+msgid "Activating…"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:169
+#. translators: %s: Plugin name.
+msgid ""
+"This will activate the %s plugin on your site, then download your settings. "
+"Continue?"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:172
+#. translators: %s: Link to the Plugins screen.
+msgid ""
+"The Import / Export plugin could not be activated. Please activate it from "
+"%s."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:202
+#. translators: %s: Plugin name.
+msgid "Install %s to export your Customizer settings and import them later."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:204
+msgid "(opens in a new tab)"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:211
+#. translators: %s: Plugin name.
+msgid ""
+"Installs and activates the free %s plugin, then downloads your published "
+"settings as a file."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:212
+msgid "Installing…"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:214
+#. translators: %s: Plugin name.
+msgid ""
+"This will install the free %s plugin from WordPress.org, activate it on "
+"your site, then download your settings. Continue?"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset-backup.php:220
+#. translators: %s: Link to the plugin install screen.
+msgid ""
+"The Import / Export plugin could not be installed. Please install it from "
+"%s."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset.php:88
+#. translators: %s: Theme name.
+msgid ""
+"All %s theme customizer settings will be removed and saved right away. "
+"Visitors will see the default settings at once. This cannot be undone. "
+"Continue?"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset.php:89
+msgid ""
+"This Customizer also has saved changes that are not published yet (a draft "
+"or a scheduled change). They will load again after the reset and will be "
+"applied when they are published."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset.php:90
 msgid "Reset All"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset.php:91
+msgid "Reset options"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset.php:92
+msgid "Reset in Preview"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset.php:93
+msgid ""
+"See the default settings first. Click Publish to save them, or close or "
+"reload the Customizer to cancel."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset.php:94
+msgid "Reset and Publish Now"
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset.php:95
+msgid ""
+"Removes all settings and saves right away. Visitors see the default "
+"settings at once."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset.php:97
+#. translators: %s: Theme name.
+msgid ""
+"%s settings are reset in the preview only. Click Publish to save the reset, "
+"or close or reload the Customizer to cancel it."
+msgstr ""
+
+#: classes/class-astra-theme-customizer-reset.php:98
+msgid "The settings could not be reset. Please reload the page and try again."
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Astra Customizer Reset"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://wpastra.com/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Reset the Astra theme customizer options from customizer interface."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Brainstorm Force"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://www.brainstormforce.com"
 msgstr ""
