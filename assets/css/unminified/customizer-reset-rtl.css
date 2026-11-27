@@ -134,7 +134,7 @@
 	background: #f0f0f1;
 }
 
-/* "Back up first" nudge, just before "Reset and Publish Now". */
+/* "Back up first" row, just before "Reset and Publish Now". */
 .astra-reset-menu .astra-reset-menu-item.is-backup {
 	text-decoration: none;
 }
@@ -158,3 +158,24 @@
 	color: #646970;
 }
 
+
+/* Installing, activating or exporting. */
+.astra-reset-menu .astra-reset-menu-item.is-backup.is-busy {
+	cursor: progress;
+}
+
+.astra-reset-menu .astra-reset-menu-item.is-backup.is-busy .dashicons-download {
+	animation: astra-reset-pulse 1s ease-in-out infinite;
+}
+
+@keyframes astra-reset-pulse {
+	50% {
+		opacity: 0.3;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.astra-reset-menu .astra-reset-menu-item.is-backup.is-busy .dashicons-download {
+		animation: none;
+	}
+}

@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Astra Customizer Reset 1.1.0\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/reset-astra-customizer\n"
-"POT-Creation-Date: 2026-11-26 07:46:43+00:00\n"
+"POT-Creation-Date: 2026-11-27 08:22:14+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,12 +25,12 @@ msgstr ""
 "X-Textdomain-Support: yes\n"
 "X-Generator: grunt-wp-i18n1.0.2\n"
 
-#: class-astra-theme-customizer-reset.php:263
-#: class-astra-theme-customizer-reset.php:323
+#: class-astra-theme-customizer-reset.php:564
+#: class-astra-theme-customizer-reset.php:664
 msgid "Astra"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:286
+#: class-astra-theme-customizer-reset.php:587
 #. translators: %s: Theme name.
 msgid ""
 "All %s theme customizer settings will be removed and saved right away. "
@@ -38,83 +38,151 @@ msgid ""
 "Continue?"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:287
+#: class-astra-theme-customizer-reset.php:588
 msgid ""
 "This Customizer also has saved changes that are not published yet (a draft "
 "or a scheduled change). They will load again after the reset and will be "
 "applied when they are published."
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:288
+#: class-astra-theme-customizer-reset.php:589
 msgid "Reset All"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:289
+#: class-astra-theme-customizer-reset.php:590
 msgid "Reset options"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:290
+#: class-astra-theme-customizer-reset.php:591
 msgid "Reset in Preview"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:291
+#: class-astra-theme-customizer-reset.php:592
 msgid ""
 "See the default settings first. Click Publish to save them, or close or "
 "reload the Customizer to cancel."
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:292
+#: class-astra-theme-customizer-reset.php:593
 msgid "Reset and Publish Now"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:293
+#: class-astra-theme-customizer-reset.php:594
 msgid ""
 "Removes all settings and saves right away. Visitors see the default "
 "settings at once."
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:295
+#: class-astra-theme-customizer-reset.php:596
 #. translators: %s: Theme name.
 msgid ""
 "%s settings are reset in the preview only. Click Publish to save the reset, "
 "or close or reload the Customizer to cancel it."
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:296
+#: class-astra-theme-customizer-reset.php:597
 msgid "The settings could not be reset. Please reload the page and try again."
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:322
+#: class-astra-theme-customizer-reset.php:663
 msgid "Import / Export Customizer Settings"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:325
+#: class-astra-theme-customizer-reset.php:666
 msgid "Back Up Settings First"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:326
-msgid "(opens in a new tab)"
+#: class-astra-theme-customizer-reset.php:691
+#. translators: %s: Theme name.
+msgid "%s > Settings"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:339
+#: class-astra-theme-customizer-reset.php:695
 msgid "Export Settings First"
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:341
+#: class-astra-theme-customizer-reset.php:697
 #. translators: %s: Theme name.
 msgid ""
-"Export your Customizer settings from %s > Settings. You can import them "
-"there later. The site logo is not included."
+"Downloads your published settings as a file. To restore them, import the "
+"file in %s > Settings. The site logo is not included."
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:363
+#: class-astra-theme-customizer-reset.php:698
+msgid "Exporting…"
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:703
+#. translators: %s: Link to the theme settings page.
+msgid "Settings exported. To restore them later, import the file in %s."
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:705
+#. translators: %s: Link to the theme settings page.
+msgid "The settings could not be exported. Please export them from %s."
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:709
+#: class-astra-theme-customizer-reset.php:774
+msgid "Plugins"
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:720
 #. translators: %s: Plugin name.
-msgid "Activate %s to export your Customizer settings and import them later."
+msgid "Activates the %s plugin, then downloads your published settings as a file."
 msgstr ""
 
-#: class-astra-theme-customizer-reset.php:385
+#: class-astra-theme-customizer-reset.php:721
+#: class-astra-theme-customizer-reset.php:769
+msgid "Activating…"
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:723
+#. translators: %s: Plugin name.
+msgid ""
+"This will activate the %s plugin on your site, then download your settings. "
+"Continue?"
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:726
+#. translators: %s: Link to the Plugins screen.
+msgid ""
+"The Import / Export plugin could not be activated. Please activate it from "
+"%s."
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:756
 #. translators: %s: Plugin name.
 msgid "Install %s to export your Customizer settings and import them later."
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:758
+msgid "(opens in a new tab)"
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:765
+#. translators: %s: Plugin name.
+msgid ""
+"Installs and activates the free %s plugin, then downloads your published "
+"settings as a file."
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:766
+msgid "Installing…"
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:768
+#. translators: %s: Plugin name.
+msgid ""
+"This will install the free %s plugin from WordPress.org, activate it on "
+"your site, then download your settings. Continue?"
+msgstr ""
+
+#: class-astra-theme-customizer-reset.php:774
+#. translators: %s: Link to the plugin install screen.
+msgid ""
+"The Import / Export plugin could not be installed. Please install it from "
+"%s."
 msgstr ""
 
 #. Plugin Name of the plugin/theme

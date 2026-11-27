@@ -14,7 +14,7 @@ This plugin helps to reset customizer settings for the Astra theme, with a previ
 
 Astra Customizer Reset plugin resets all Astra customizer settings to their defaults. The plugin will serve to <a href="https://wordpress.org/themes/astra/" target="_blank"> Astra </a>WordPress theme only.
 
-It adds a "Reset All" button in the customizer. It opens a menu where you can reset in the preview first and publish when you are happy, or reset and publish right away. It also links to the Import / Export Customizer Settings plugin, so you can export your settings before you reset.
+It adds a "Reset All" button in the customizer. It opens a menu where you can reset in the preview first and publish when you are happy, or reset and publish right away. It can also export your settings before you reset, with the free Import / Export Customizer Settings plugin. The menu installs and activates that plugin for you if needed.
 
 = When it can be used? =
 
@@ -39,25 +39,27 @@ Once you install and activate this plugin, go to Appearance > Customize. The Res
 
 Use "Reset in Preview" if you are not sure. It shows the default settings in the preview only. Close or reload the customizer without clicking Publish and your settings stay as they were.
 
-Once a reset is published, or if you use "Reset and Publish Now", it can not be reverted. You will have to set all the choices again by hand. To be safe, export your settings first with the Import / Export Customizer Settings plugin. The Reset All menu links to it ("Export Settings First", or "Back Up Settings First" when the plugin is not active yet).
+Once a reset is published, or if you use "Reset and Publish Now", it can not be reverted. You will have to set all the choices again by hand. To be safe, export your settings first. In the Reset All menu, "Export Settings First" downloads your published settings as a file, using the Import / Export Customizer Settings plugin. If that plugin is not active yet, the menu shows "Back Up Settings First", which installs and activates it for you, then downloads the file. To restore the settings, import the file in Astra > Settings.
 
 = What is the difference between "Reset in Preview" and "Reset and Publish Now"? =
 
-"Reset in Preview" resets the settings you can change in the customizer, so you can check the result before you publish. It saves the default values of those settings, so they will not follow changes to the defaults in later Astra versions.
+Both give the same clean start as a new site. The difference is when the reset is saved.
 
-"Reset and Publish Now" removes all saved Astra settings at once, including settings that are not shown in the customizer. This gives you the same clean start as a new site. On sites that were set up with an older version of Astra, some default values can be different from "Reset in Preview".
+"Reset in Preview" shows the reset in the preview first. Nothing changes on your live site until you click Publish, and you can still change settings before you publish. It saves the default values of the settings you can change in the customizer, so they will not follow changes to the defaults in later Astra versions.
+
+"Reset and Publish Now" removes all saved Astra settings at once and reloads the customizer. Your live site changes right away.
 
 == Screenshots ==
 
 1. The Reset All button next to Publish in the Astra customizer
-2. The Reset All menu: Reset in Preview, Reset and Publish Now, and the backup link
+2. The Reset All menu: Reset in Preview, Export Settings First, and Reset and Publish Now
 
 == Changelog ==
 
 = 1.1.0 =
 - New: Reset All now opens a menu with two options: "Reset in Preview" and "Reset and Publish Now".
 - New: Reset in Preview shows the default settings first. Your live site does not change until you click Publish.
-- New: The Reset All menu links to export a backup first with the Import / Export Customizer Settings plugin.
+- New: Export a backup from the Reset All menu before you reset. It installs and activates the Import / Export Customizer Settings plugin if needed.
 - Improvement: The Reset All menu works with the keyboard and screen readers.
 
 = 1.0.7 =

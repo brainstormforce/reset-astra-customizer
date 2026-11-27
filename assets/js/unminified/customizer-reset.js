@@ -15,6 +15,76 @@
 	const NOTICE     = 'astra_customizer_reset_pending';
 	const PENDING_ID = 'astra-customizer-reset-pending';
 
+	// True while a confirm dialog is open. The dialog blurs the window, which
+	// would otherwise close the menu.
+	let confirming = false;
+
+	// Settings without a default changed before the reset, which it removes
+	// unless they are changed again. Sent with the "reset pending" flag.
+	const STALE_KEY  = /^[A-Za-z0-9_-]+$/;
+	const staleKeys  = new Set();
+	const staleWatch = new Map();
+	let pendingStamp = '';
+
+	/**
+	 * Set the "reset pending" flag: "{timestamp}" or "{timestamp}|{key},{key}".
+	 */
+	const setPending = () => {
+		if ( api.has( PENDING_ID ) ) {
+			api( PENDING_ID ).set( staleKeys.size ? `${ pendingStamp }|${ [ ...staleKeys ].join( ',' ) }` : pendingStamp );
+		}
+	};
+
+	/**
+	 * Track the stale settings: one changed after the reset is kept.
+	 *
+	 * @param {Set} keys Setting keys.
+	 */
+	const watchStale = ( keys ) => {
+		staleWatch.forEach( ( handler, id ) => {
+			if ( api.has( id ) ) {
+				api( id ).unbind( handler );
+			}
+		} );
+		staleWatch.clear();
+		staleKeys.clear();
+
+		keys.forEach( ( key ) => {
+			const id = `${ PREFIX }${ key }]`;
+
+			if ( ! STALE_KEY.test( key ) || ! api.has( id ) ) {
+				return;
+			}
+
+			const handler = () => {
+				api( id ).unbind( handler );
+				staleWatch.delete( id );
+				staleKeys.delete( key );
+				setPending();
+			};
+
+			staleKeys.add( key );
+			staleWatch.set( id, handler );
+			api( id ).bind( handler );
+		} );
+	};
+
+	/**
+	 * Ask the user to confirm, without the dialog closing the menu.
+	 *
+	 * @param {string} message Question.
+	 * @return {boolean} Whether the user confirmed.
+	 */
+	const confirmKeepMenu = ( message ) => {
+		confirming = true;
+		const confirmed = window.confirm( message );
+		// The blur event can arrive after the dialog closes.
+		setTimeout( () => {
+			confirming = false;
+		} );
+		return confirmed;
+	};
+
 	/**
 	 * Create an element with attributes and children.
 	 *
@@ -61,10 +131,89 @@
 	};
 
 	/**
-	 * Reset in Preview: nothing is saved until the user clicks Publish.
+	 * Show the reset as busy (header spinner, disabled button) or not.
+	 *
+	 * @param {HTMLButtonElement} button The Reset All button.
+	 * @param {boolean}           busy   Whether a reset is running.
 	 */
-	const resetInPreview = () => {
-		const defaults = l10n.defaults || {};
+	const setResetBusy = ( button, busy ) => {
+		const spinner = document.querySelector( '#customize-header-actions .spinner' );
+
+		if ( spinner ) {
+			spinner.classList.toggle( 'is-active', busy );
+		}
+		button.disabled = busy;
+	};
+
+	/**
+	 * Show an error notification for a failed reset.
+	 */
+	const showResetError = () => {
+		api.notifications.add(
+			new api.Notification( 'astra_customizer_reset_error', {
+				type: 'error',
+				message: l10n.stringError,
+				dismissible: true,
+			} )
+		);
+	};
+
+	/**
+	 * Save a setting in the changeset even when its value did not change, as
+	 * core does on a change.
+	 *
+	 * @param {Object} setting Customizer setting.
+	 */
+	const markChanged = ( setting ) => {
+		setting._dirty = true;
+
+		if ( api._latestSettingRevisions ) {
+			api._latestRevision += 1;
+			api._latestSettingRevisions[ setting.id ] = api._latestRevision;
+		}
+	};
+
+	/**
+	 * Reset in Preview: nothing is saved until the user clicks Publish.
+	 *
+	 * @param {HTMLButtonElement} button The Reset All button.
+	 */
+	const resetInPreview = async ( button ) => {
+		const processing = api.state( 'processing' );
+
+		setResetBusy( button, true );
+		// Publish waits until the reset is applied.
+		processing.set( processing.get() + 1 );
+
+		try {
+			const result = await ajax( {
+				action: l10n.defaultsAction,
+				nonce: l10n.nonce,
+				changeset_uuid: api.settings.changeset.uuid,
+			} );
+
+			if ( ! result || ! result.success || ! result.data ) {
+				throw new Error( 'No defaults' );
+			}
+
+			applyReset( result.data );
+			showPendingNotice();
+		} catch ( error ) {
+			showResetError();
+		} finally {
+			processing.set( processing.get() - 1 );
+			setResetBusy( button, false );
+		}
+	};
+
+	/**
+	 * Set the reset values in the Customizer.
+	 *
+	 * @param {Object} data Defaults from the server.
+	 */
+	const applyReset = ( data ) => {
+		const defaults = data.defaults || {};
+		const stale    = new Set( data.stale || [] );
 
 		api.each( ( setting ) => {
 			// Notice boxes only show a message and hold no value.
@@ -74,17 +223,19 @@
 
 			const key = setting.id.slice( PREFIX.length, -1 );
 
-			// Settings without a known default are left as they are. Emptying them
-			// breaks controls that expect an object (for example responsive spacing).
 			if ( Object.prototype.hasOwnProperty.call( defaults, key ) ) {
 				setting.set( clone( defaults[ key ] ) );
+				markChanged( setting );
+			} else if ( setting._dirty ) {
+				// No default: the server removes it, also when changed before.
+				stale.add( key );
 			}
 		} );
 
 		// Global color palette. Replace the whole value, like the full reset that
 		// deletes the option, so custom colors and palette names are removed too.
-		if ( api.has( 'astra-color-palettes' ) && l10n.paletteDefaults && l10n.paletteDefaults.palettes ) {
-			api( 'astra-color-palettes' ).set( clone( l10n.paletteDefaults ) );
+		if ( api.has( 'astra-color-palettes' ) && data.paletteDefaults && data.paletteDefaults.palettes ) {
+			api( 'astra-color-palettes' ).set( clone( data.paletteDefaults ) );
 		}
 
 		// Typography presets are removed by the full reset, so empty them here too.
@@ -97,13 +248,83 @@
 			api( 'custom_logo' ).set( '' );
 		}
 
-		// Tell the server to also reset the Astra admin settings on Publish.
-		// A new value each time, so it is sent again after an earlier reset.
-		if ( api.has( PENDING_ID ) ) {
-			api( PENDING_ID ).set( String( Date.now() ) );
+		// New value each time, so it is sent again after an earlier reset.
+		pendingStamp = String( Date.now() );
+		watchStale( stale );
+		setPending();
+	};
+
+
+	/**
+	 * Discard this session's autosave, so it is not offered after the reload.
+	 */
+	const dismissAutosave = async () => {
+		const nonce = api.settings.nonce && api.settings.nonce.dismiss_autosave_or_lock;
+
+		// Stop core from saving the changes again while the page unloads, as its
+		// own close button does.
+		api.each( ( setting ) => {
+			setting._dirty = false;
+		} );
+		if ( window.jQuery ) {
+			window.jQuery( document ).off( 'visibilitychange.wp-customize-changeset-update' );
+			window.jQuery( window ).off( 'beforeunload.wp-customize-changeset-update' );
 		}
 
-		showPendingNotice();
+		if ( ! nonce ) {
+			return;
+		}
+
+		// Wait for a changeset update that is already running.
+		await new Promise( ( resolve ) => {
+			const processing = api.state( 'processing' );
+			const check = () => {
+				if ( 0 === processing.get() ) {
+					processing.unbind( check );
+					resolve();
+				}
+			};
+			processing.bind( check );
+			check();
+		} );
+
+		// Core skips the auto-draft named in the request, so name a new changeset
+		// to dismiss this session's auto-draft too. A draft keeps its own UUID,
+		// so only its autosave revision is deleted.
+		const status = api.state( 'changesetStatus' ).get();
+		const uuid   = '' === status || 'auto-draft' === status ? newUuid() : api.settings.changeset.uuid;
+
+		try {
+			await ajax( {
+				action: 'customize_dismiss_autosave_or_lock',
+				wp_customize: 'on',
+				customize_theme: api.settings.theme.stylesheet,
+				customize_changeset_uuid: uuid,
+				nonce,
+				dismiss_autosave: 'true',
+			} );
+		} catch ( error ) {
+			// No autosave to dismiss.
+		}
+	};
+
+	/**
+	 * A random UUID v4. `crypto.randomUUID()` needs HTTPS.
+	 *
+	 * @return {string} UUID.
+	 */
+	const newUuid = () =>
+		'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace( /[xy]/g, ( char ) => {
+			const random = Math.floor( Math.random() * 16 );
+			return ( 'x' === char ? random : ( random % 4 ) + 8 ).toString( 16 );
+		} );
+
+	/**
+	 * Reload the Customizer without the changeset in the URL.
+	 */
+	const reloadCustomizer = () => {
+		api.state( 'saved' ).set( true );
+		window.location.href = window.location.href.split( '?' )[ 0 ];
 	};
 
 	/**
@@ -113,45 +334,269 @@
 	 * @param {HTMLButtonElement} button The Reset All button.
 	 */
 	const resetAndPublish = async ( button ) => {
-		const spinner = document.querySelector( '#customize-header-actions .spinner' );
-
-		if ( spinner ) {
-			spinner.classList.add( 'is-active' );
-		}
-		button.disabled = true;
+		setResetBusy( button, true );
 
 		try {
-			const response = await fetch( window.ajaxurl, {
-				method: 'POST',
-				credentials: 'same-origin',
-				body: new URLSearchParams( {
-					wp_customize: 'on',
-					action: 'astra_theme_customizer_reset',
-					nonce: l10n.nonce,
-				} ),
+			const result = await ajax( {
+				wp_customize: 'on',
+				action: 'astra_theme_customizer_reset',
+				nonce: l10n.nonce,
 			} );
-			const result = await response.json();
 
 			if ( ! result || ! result.success ) {
 				throw new Error( 'Reset failed' );
 			}
-
-			// Mark as saved so the "leave page" warning does not show, then reload.
-			api.state( 'saved' ).set( true );
-			window.location.href = window.location.href.split( '?' )[ 0 ];
 		} catch ( error ) {
-			if ( spinner ) {
-				spinner.classList.remove( 'is-active' );
+			setResetBusy( button, false );
+			showResetError();
+			return;
+		}
+
+		await dismissAutosave();
+		reloadCustomizer();
+	};
+
+	/**
+	 * POST to admin-ajax.php.
+	 *
+	 * @param {Object} data Fields to send.
+	 * @return {Promise<Object>} The JSON response.
+	 */
+	const ajax = async ( data ) => {
+		const response = await fetch( window.ajaxurl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			body: new URLSearchParams( data ),
+		} );
+
+		return response.json();
+	};
+
+	/**
+	 * Show an error notification. The message is HTML built on the server.
+	 *
+	 * @param {string} message Message.
+	 */
+	const showBackupError = ( message ) => {
+		api.notifications.add(
+			new api.Notification( 'astra_customizer_reset_backup_error', {
+				type: 'error',
+				message,
+				dismissible: true,
+			} )
+		);
+	};
+
+	/**
+	 * Create the "back up first" menu row: a button, or a link to the plugin
+	 * install screen when WordPress needs FTP details to install plugins.
+	 *
+	 * @param {Object} data Row data from the server.
+	 * @return {HTMLElement} The row.
+	 */
+	const backupItem = ( data ) => {
+		const isLink = 'link' === data.action;
+		const attrs  = {
+			role: 'menuitem',
+			class: 'astra-reset-menu-item is-backup',
+			tabindex: '-1',
+			'data-action': 'backup',
+			'aria-labelledby': 'astra-reset-label-backup',
+			'aria-describedby': 'astra-reset-help-backup',
+		};
+
+		if ( isLink ) {
+			// Opens in a new tab so the Customizer and its changes stay open.
+			Object.assign( attrs, { href: data.url, target: '_blank', rel: 'noopener noreferrer' } );
+		} else {
+			attrs.type = 'button';
+		}
+
+		const item = el( isLink ? 'a' : 'button', attrs, [
+			el( 'span', { class: 'astra-reset-menu-item-label', id: 'astra-reset-label-backup' }, [
+				el( 'span', { class: 'dashicons dashicons-download', 'aria-hidden': 'true' } ),
+				el( 'span', { class: 'astra-reset-backup-text', text: data.label } ),
+				...( isLink
+					? [
+						el( 'span', { class: 'dashicons dashicons-external', 'aria-hidden': 'true' } ),
+						el( 'span', { class: 'screen-reader-text', text: ` ${ data.newTab }` } ),
+					]
+					: [] ),
+			] ),
+			el( 'span', { class: 'astra-reset-menu-item-help', id: 'astra-reset-help-backup', text: data.help } ),
+		] );
+
+		item.backupData = data;
+		return item;
+	};
+
+	/**
+	 * Show the row as working (or not), with a status text.
+	 *
+	 * @param {HTMLElement} item Backup row.
+	 * @param {string|null} text Status text, or null when done.
+	 */
+	const setBusy = ( item, text ) => {
+		const label = item.querySelector( '.astra-reset-backup-text' );
+
+		item.classList.toggle( 'is-busy', null !== text );
+		item.setAttribute( 'aria-disabled', null !== text ? 'true' : 'false' );
+		label.textContent = null !== text ? text : item.backupData.label;
+
+		// A changed label on the focused row is not reliably read out, so announce it.
+		if ( null !== text ) {
+			wp.a11y.speak( text );
+		}
+	};
+
+	/**
+	 * Install and activate the Import / Export plugin, then switch the row to
+	 * export. Uses the core install endpoint that `wp.updates.installPlugin()`
+	 * uses, so no reload is needed.
+	 *
+	 * @param {HTMLElement} item Backup row.
+	 * @return {Promise<boolean>} Whether the row can export now.
+	 */
+	const installAndActivate = async ( item ) => {
+		const data = item.backupData;
+
+		try {
+			if ( 'install' === data.action ) {
+				setBusy( item, data.busy );
+
+				const installed = await ajax( {
+					action: 'install-plugin',
+					slug: data.slug,
+					_ajax_nonce: data.installNonce,
+				} );
+
+				// Already there (installed in another tab) is fine: activate it.
+				if ( ! installed.success && ! ( installed.data && 'folder_exists' === installed.data.errorCode ) ) {
+					throw new Error( 'Install failed' );
+				}
+
+				setBusy( item, data.busyNext );
+			} else {
+				setBusy( item, data.busy );
 			}
-			button.disabled = false;
+
+			const activated = await ajax( {
+				action: 'astra_customizer_reset_activate_import_export',
+				nonce: data.nonce,
+			} );
+
+			if ( ! activated.success ) {
+				throw new Error( 'Activate failed' );
+			}
+
+			if ( ! activated.data ) {
+				// The user can not export: nothing more to show.
+				item.previousElementSibling.remove();
+				item.remove();
+				return false;
+			}
+
+			// Now an export row, so a failed export can be tried again from it.
+			item.backupData = activated.data;
+			item.querySelector( '.astra-reset-menu-item-help' ).textContent = activated.data.help;
+			setBusy( item, null );
+			return true;
+		} catch ( error ) {
+			setBusy( item, null );
+			showBackupError( data.error );
+			return false;
+		}
+	};
+
+	/**
+	 * Download the export file of the Import / Export plugin. Its export is a
+	 * POST handled on `admin_init`, so this sends the same fields. Done with
+	 * fetch, so a failure never leaves the Customizer and its changes.
+	 *
+	 * @param {HTMLElement} item Backup row.
+	 * @return {Promise<boolean>} Whether the file was downloaded.
+	 */
+	const exportSettings = async ( item ) => {
+		const data = item.backupData;
+
+		setBusy( item, data.busy );
+
+		try {
+			const response = await fetch( data.postUrl, {
+				method: 'POST',
+				credentials: 'same-origin',
+				body: new URLSearchParams( {
+					astra_ie_action: 'export_settings',
+					astra_export_nonce: data.nonce,
+				} ),
+			} );
+			const type = response.headers.get( 'Content-Type' ) || '';
+
+			// Anything else means the export did not run (for example an expired nonce).
+			if ( ! response.ok || ! type.includes( 'application/json' ) ) {
+				throw new Error( 'Export failed' );
+			}
+
+			const disposition = response.headers.get( 'Content-Disposition' ) || '';
+			const match       = /filename="?([^";]+)"?/.exec( disposition );
+			const url         = URL.createObjectURL( await response.blob() );
+			const link        = el( 'a', { href: url, download: match ? match[ 1 ] : 'astra-settings-export.json' } );
+
+			document.body.append( link );
+			link.click();
+			link.remove();
+			setTimeout( () => URL.revokeObjectURL( url ), 1000 );
 
 			api.notifications.add(
-				new api.Notification( 'astra_customizer_reset_error', {
-					type: 'error',
-					message: l10n.stringError,
+				new api.Notification( 'astra_customizer_reset_exported', {
+					type: 'success',
+					message: data.done,
 					dismissible: true,
 				} )
 			);
+			return true;
+		} catch ( error ) {
+			showBackupError( data.error );
+			return false;
+		} finally {
+			setBusy( item, null );
+		}
+	};
+
+	/**
+	 * Handle a click on the backup row.
+	 *
+	 * @param {HTMLElement} item      Backup row.
+	 * @param {Function}    closeMenu Closes the menu.
+	 */
+	const runBackup = async ( item, closeMenu ) => {
+		if ( item.classList.contains( 'is-busy' ) ) {
+			return;
+		}
+
+		if ( 'export' === item.backupData.action ) {
+			if ( await exportSettings( item ) ) {
+				closeMenu( true );
+			}
+			return;
+		}
+
+		// Installing or activating changes the site, so ask first.
+		if ( ! confirmKeepMenu( item.backupData.confirm ) ) {
+			item.focus();
+			return;
+		}
+
+		// The menu stays open, so the row can show the progress. Then export
+		// right away, so it is one click.
+		item.focus();
+		const ready = await installAndActivate( item );
+
+		if ( ! item.isConnected ) {
+			// The row was removed (the user can not export).
+			closeMenu( true );
+		} else if ( ready && await exportSettings( item ) ) {
+			closeMenu( true );
 		}
 	};
 
@@ -218,38 +663,14 @@
 		const backup = l10n.backup;
 
 		if ( backup ) {
-			// Opens in a new tab so the Customizer and its changes stay open.
-			const backupItem = el(
-				'a',
-				{
-					href: backup.url,
-					target: '_blank',
-					rel: 'noopener noreferrer',
-					role: 'menuitem',
-					class: 'astra-reset-menu-item is-backup',
-					tabindex: '-1',
-					'data-action': 'backup',
-					'aria-labelledby': 'astra-reset-label-backup',
-					'aria-describedby': 'astra-reset-help-backup',
-				},
-				[
-					el( 'span', { class: 'astra-reset-menu-item-label', id: 'astra-reset-label-backup' }, [
-						el( 'span', { class: 'dashicons dashicons-download', 'aria-hidden': 'true' } ),
-						backup.label,
-						el( 'span', { class: 'dashicons dashicons-external', 'aria-hidden': 'true' } ),
-						el( 'span', { class: 'screen-reader-text', text: ` ${ backup.newTab }` } ),
-					] ),
-					el( 'span', { class: 'astra-reset-menu-item-help', id: 'astra-reset-help-backup', text: backup.help } ),
-				]
-			);
-
-			menu.append( separator(), backupItem );
+			menu.append( separator(), backupItem( backup ) );
 		}
 
 		// The destructive option goes last, so it is the hardest one to pick by mistake.
 		menu.append( separator(), menuItem( 'publish', l10n.stringPublish, l10n.stringPublishHelp, 'is-destructive' ) );
 
-		const items = [ ...menu.querySelectorAll( '[role="menuitem"]' ) ];
+		// Read each time: the backup row can be removed after the plugin is activated.
+		const getItems = () => [ ...menu.querySelectorAll( '[role="menuitem"]' ) ];
 
 		const isOpen = () => 'true' === button.getAttribute( 'aria-expanded' );
 
@@ -257,6 +678,7 @@
 			menu.hidden = false;
 			button.setAttribute( 'aria-expanded', 'true' );
 			// A negative index counts from the end (-1 is the last item).
+			const items = getItems();
 			items[ ( focusIndex + items.length ) % items.length ].focus();
 		};
 
@@ -291,6 +713,7 @@
 		} );
 
 		menu.addEventListener( 'keydown', ( event ) => {
+			const items = getItems();
 			const index = items.indexOf( document.activeElement );
 			const focus = ( i ) => items[ ( i + items.length ) % items.length ].focus();
 
@@ -327,15 +750,24 @@
 				closeMenu();
 			}
 		} );
-		window.addEventListener( 'blur', () => closeMenu() );
+		window.addEventListener( 'blur', () => {
+			if ( ! confirming ) {
+				closeMenu();
+			}
+		} );
 
-		items.forEach( ( item ) =>
+		getItems().forEach( ( item ) =>
 			item.addEventListener( 'click', ( event ) => {
 				const { action } = item.dataset;
 
-				// The backup link opens in a new tab by itself.
 				if ( 'backup' === action ) {
-					closeMenu( true );
+					// The link (install screen) opens in a new tab by itself.
+					if ( 'A' === item.tagName ) {
+						closeMenu( true );
+					} else {
+						event.preventDefault();
+						runBackup( item, closeMenu );
+					}
 					return;
 				}
 
@@ -343,7 +775,7 @@
 				closeMenu( true );
 
 				if ( 'preview' === action ) {
-					resetInPreview();
+					resetInPreview( button );
 				} else if ( 'publish' === action && window.confirm( confirmText() ) ) {
 					resetAndPublish( button );
 				}
@@ -365,14 +797,29 @@
 		// A changeset that already holds a reset (restored autosave, draft,
 		// scheduled or taken-over changeset) will reset on Publish too, so say so.
 		if ( api.has( PENDING_ID ) && api( PENDING_ID ).get() ) {
+			const [ stamp, keys = '' ] = api( PENDING_ID ).get().split( '|' );
+
+			pendingStamp = stamp;
+			watchStale( new Set( keys ? keys.split( ',' ) : [] ) );
 			showPendingNotice();
 		}
 
 		// Once published the reset is saved, so the notice is no longer true. After
 		// Save Draft or Schedule the reset is still pending, so the notice stays.
+		let reloadedFor = '';
+
 		api.bind( 'saved', ( response ) => {
 			if ( response && 'publish' === response.changeset_status ) {
 				api.notifications.remove( NOTICE );
+
+				// Reload once to show the settings the server removed. Still dirty
+				// means the reset was not part of this publish.
+				const pending = api.has( PENDING_ID ) ? api( PENDING_ID ) : null;
+
+				if ( pending && pending.get() && ! pending._dirty && pending.get() !== reloadedFor ) {
+					reloadedFor = pending.get();
+					reloadCustomizer();
+				}
 			}
 		} );
 
@@ -447,7 +894,9 @@
 			// Sidebar resizes and Publish button label changes.
 			const observer = new ResizeObserver( update );
 			observer.observe( headerActions );
-			const publish = document.getElementById( 'customize-save-button-wrapper' );
+			// The Publish button itself, not its wrapper: the wrapper also holds the
+			// Reset All button, so watching it would loop when the button resizes.
+			const publish = document.querySelector( '#customize-save-button-wrapper .save' );
 			if ( publish ) {
 				observer.observe( publish );
 			}

@@ -25,6 +25,18 @@ The plugin entry point is `class-astra-theme-customizer-reset.php`, which:
 - **Separation of concerns:** Admin and frontend code are separated into different classes/directories
 - **WordPress Customizer integration:** Settings are registered via the Customizer API where applicable
 
+## Reset Flow
+
+Both resets must give the same result: the `astra-settings` option with only `theme-auto-version` and `astra-addon-auto-version`, plus the palette, typography presets, logo and Astra admin settings removed.
+
+- **Reset and Publish Now** (`ajax_customizer_reset`): writes that result directly, dismisses the session autosave, then reloads.
+- **Reset in Preview** (JS `resetInPreview`):
+  1. Fetches defaults from `astra_customizer_reset_defaults`. That request reads `astra-settings` as reset (`pre_option_` filter, writes blocked), because Astra computes many defaults from its saved compatibility flags.
+  2. Sets every Customizer setting that has a default and marks it changed, so it is in the changeset even when the value is the same.
+  3. Sets the `astra-customizer-reset-pending` flag: `{timestamp}|{keys}`. The keys are settings without a default changed before the reset.
+  4. Preview (`preview_pending_reset`) and publish (`publish_pending_reset`, `customize_save_after`) keep only the version keys and the changeset keys, minus those listed keys. This removes settings without a default (breadcrumb, blog filter, Astra's `isset()` compatibility flags).
+  5. After a publish that contained the reset, the Customizer reloads.
+
 ## Dependencies
 
 - WordPress core (required)
