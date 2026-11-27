@@ -200,6 +200,8 @@
 				]
 			);
 
+		const separator = () => el( 'div', { class: 'astra-reset-menu-separator', role: 'separator' } );
+
 		const menu = el(
 			'div',
 			{
@@ -208,15 +210,11 @@
 				role: 'menu',
 				'aria-label': l10n.stringMenuLabel,
 			},
-			[
-				menuItem( 'preview', l10n.stringPreview, l10n.stringPreviewHelp ),
-				el( 'div', { class: 'astra-reset-menu-separator', role: 'separator' } ),
-				menuItem( 'publish', l10n.stringPublish, l10n.stringPublishHelp, 'is-destructive' ),
-			]
+			[ menuItem( 'preview', l10n.stringPreview, l10n.stringPreviewHelp ) ]
 		);
 		menu.hidden = true;
 
-		// Nudge to back up first, shown at the end of the menu.
+		// Nudge to back up first, shown just before the reset that cannot be undone.
 		const backup = l10n.backup;
 
 		if ( backup ) {
@@ -245,8 +243,11 @@
 				]
 			);
 
-			menu.append( el( 'div', { class: 'astra-reset-menu-separator', role: 'separator' } ), backupItem );
+			menu.append( separator(), backupItem );
 		}
+
+		// The destructive option goes last, so it is the hardest one to pick by mistake.
+		menu.append( separator(), menuItem( 'publish', l10n.stringPublish, l10n.stringPublishHelp, 'is-destructive' ) );
 
 		const items = [ ...menu.querySelectorAll( '[role="menuitem"]' ) ];
 
@@ -386,6 +387,71 @@
 			headerActions.append( button );
 		}
 		headerActions.append( menu );
+
+		fitInHeader( headerActions, button );
+	};
+
+	/**
+	 * Hide the "Reset All" text (the icon stays) when the header is too narrow
+	 * for it, so the button does not slide under the icons at the other end of
+	 * the header (close, Astra's tour). This happens with the narrowest sidebar,
+	 * long translations, or when Publish changes to "Save Draft" or "Schedule".
+	 * The text stays readable for screen readers.
+	 *
+	 * @param {HTMLElement}       headerActions The Customizer header.
+	 * @param {HTMLButtonElement} button        The Reset All button.
+	 */
+	const fitInHeader = ( headerActions, button ) => {
+		const GAP   = 4;
+		const isRtl = 'rtl' === getComputedStyle( headerActions ).direction;
+		let fullWidth = 0;
+
+		const update = () => {
+			if ( ! button.offsetWidth ) {
+				return;
+			}
+
+			// Width with the text shown. Measured only then, so hiding it does not flip it back.
+			if ( ! button.classList.contains( 'is-compact' ) ) {
+				fullWidth = button.offsetWidth;
+			}
+
+			const rect = button.getBoundingClientRect();
+			let fits   = true;
+
+			// Other visible header items on the far side of the button.
+			[ ...headerActions.children ].forEach( ( child ) => {
+				if ( child.contains( button ) || child.classList.contains( 'spinner' ) || child.id === 'astra-reset-menu' || ! child.offsetWidth ) {
+					return;
+				}
+
+				const other = child.getBoundingClientRect();
+
+				if ( isRtl ) {
+					// The button grows to the left in LTR, to the right in RTL.
+					if ( other.left >= rect.left && rect.left + fullWidth + GAP > other.left ) {
+						fits = false;
+					}
+				} else if ( other.right <= rect.right && rect.right - fullWidth - GAP < other.right ) {
+					fits = false;
+				}
+			} );
+
+			button.classList.toggle( 'is-compact', ! fits );
+			button.title = fits ? '' : l10n.stringReset;
+		};
+
+		update();
+
+		if ( 'ResizeObserver' in window ) {
+			// Sidebar resizes and Publish button label changes.
+			const observer = new ResizeObserver( update );
+			observer.observe( headerActions );
+			const publish = document.getElementById( 'customize-save-button-wrapper' );
+			if ( publish ) {
+				observer.observe( publish );
+			}
+		}
 	};
 
 	api.bind( 'ready', init );

@@ -39,6 +39,19 @@
 	transition: transform 0.15s ease-in-out;
 }
 
+/* Narrow header: icon only. The text stays for screen readers. */
+#customize-header-actions .astra-reset-toggle.is-compact .astra-reset-toggle-label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
 #customize-header-actions .astra-reset-toggle[aria-expanded="true"] .dashicons {
 	transform: rotate(180deg);
 }
@@ -63,6 +76,7 @@
 
 .astra-reset-menu .astra-reset-menu-item {
 	display: block;
+	box-sizing: border-box; /* The backup row is a link: keep its padding inside the width. */
 	width: 100%;
 	margin: 0;
 	padding: 10px 16px;
@@ -120,7 +134,7 @@
 	background: #f0f0f1;
 }
 
-/* "Back up first" nudge at the end of the menu. */
+/* "Back up first" nudge, just before "Reset and Publish Now". */
 .astra-reset-menu .astra-reset-menu-item.is-backup {
 	text-decoration: none;
 }
