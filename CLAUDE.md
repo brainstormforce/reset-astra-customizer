@@ -42,10 +42,11 @@ npx grunt readme
 ## Architecture
 
 This is a WordPress plugin following standard WordPress patterns:
-- Entry point: `class-astra-theme-customizer-reset.php`
-- Constants defined for version, file path, base, dir, and URI
+- Entry point: `class-astra-theme-customizer-reset.php` (header, constants, `require_once`, init only)
+- Classes in `classes/`: `class-astra-theme-customizer-reset.php` (setup, assets, shared helpers), `-publish-now.php`, `-preview.php`, `-backup.php`
+- Constants: `ASTRA_CUSTOMIZER_VERSION`, `ASTRA_THEME_CUSTOMIZER_RESET_DIR`, `ASTRA_THEME_CUSTOMIZER_RESET_URI`
 - Assets follow the Astra theme layout: edit `assets/js/unminified/` and `assets/css/unminified/`, then run `npm run build` to generate `minified/*.min.*` and the `-rtl` CSS (never edit generated files). Commit the generated files: the WordPress.org deploy does not build. The plugin loads unminified files when `SCRIPT_DEBUG` is true, and `-rtl` CSS when `is_rtl()`
-- Classes loaded via `after_setup_theme` or `plugins_loaded` hook
+- Classes load when the plugin file loads (before the theme): the preview class adds an early `pre_option_astra-settings` filter
 - Follows WordPress Coding Standards (WPCS)
 
 ## Conventions
